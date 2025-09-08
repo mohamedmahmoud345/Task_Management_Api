@@ -1,1 +1,16 @@
 ﻿/.vs
+# build files
+bin/
+obj/
+
+# # user-specific configs
+# *.user
+# *.suo
+
+# # system files
+# .DS_Store
+# Thumbs.db
+
+# # environment
+# appsettings.Development.json
+# .env
