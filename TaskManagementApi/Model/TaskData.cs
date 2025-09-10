@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using TaskManagementApi.Enums;
 
 namespace TaskManagementApi.Model
@@ -14,8 +15,10 @@ namespace TaskManagementApi.Model
         public PriorityEnum Priority { get; set; }
         public StatusEnum Status { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("user")]
         public string? UserId { get; set; } // must not allow null i will edit it after create account controller
-        public ApplicationUser User { get; set; }
+        [JsonIgnore]
+        public ApplicationUser? User { get; set; }
     }
 }

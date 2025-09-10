@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManagementApi.Context;
+using TaskManagementApi.DTO;
 using TaskManagementApi.Model;
 using TaskManagementApi.Repositories.IRepositories;
 
@@ -13,7 +14,7 @@ namespace TaskManagementApi.Repositories
             this.context = context;
         }
 
-        public async Task Edit(TaskData data)
+        public async Task EditAsync(TaskDto data)
         {
             var task = await context.Tasks.FindAsync(data.Id);
             if (task == null) return;
@@ -23,29 +24,40 @@ namespace TaskManagementApi.Repositories
             task.DueDate = data.DueDate;
             task.Priority = data.Priority;
             task.Status = data.Status;
-            task.UserId = data.UserId;
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task<List<TaskData>> Get()
+        public async Task<List<TaskData>> GetAsync()
         {
             return await context.Tasks.ToListAsync();
         }
 
-        public async Task<TaskData> GetById(int id)
+        public async Task<TaskData> GetByIdAsync(int id)
         {
             return await context.Tasks.FindAsync(id);
         }
-
-        public async Task Remove(TaskData data)
+        public async Task AddAsync(TaskDto data)
         {
-            var task = await context.Tasks.FindAsync(data.Id);
+            if(data == null) return;
+            var task = new TaskData
+            {
+                Title = data.Title,
+                Description = data.Description,
+                DueDate = data.DueDate,
+                Priority = data.Priority,
+                Status = data.Status,
+            };
+            await context.Tasks.AddAsync(task);
+        }
+        public async Task RemoveAsync(int id)
+        {
+            var task = await context.Tasks.FindAsync(id);
             if (task == null) return;
             context.Tasks.Remove(task);
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task Save()
+        public async Task SaveAsync()
         {
            await context.SaveChangesAsync();
         }

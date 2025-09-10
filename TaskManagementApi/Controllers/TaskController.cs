@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagementApi.DTO;
 using TaskManagementApi.Repositories.IRepositories;
 
 namespace TaskManagementApi.Controllers
@@ -18,9 +17,53 @@ namespace TaskManagementApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var tasks = await repo.Get();
+            var tasks = await repo.GetAsync();
             if(!tasks.Any()) return NotFound();
             return Ok(tasks);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var task = await repo.GetByIdAsync(id);
+            if(task == null) return NotFound();
+
+            return Ok(task);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(TaskDto data)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            await repo.AddAsync(data);
+            await repo.SaveAsync();
+
+
+            return Created();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Edit(int id , TaskDto data)
+        {
+            if (id != data.Id || !ModelState.IsValid) return BadRequest();
+
+            await repo.EditAsync(data);
+            await repo.SaveAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id) 
+        {
+            var task = await repo.GetByIdAsync(id);
+            if(task == null) return BadRequest();
+
+            await repo.RemoveAsync(id);
+            await repo.SaveAsync();
+
+            return NoContent();
         }
     }
 }
