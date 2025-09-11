@@ -15,10 +15,9 @@ namespace TaskManagementApi.Model
         public PriorityEnum Priority { get; set; }
         public StatusEnum Status { get; set; }
 
-        [JsonIgnore]
+
         [ForeignKey("user")]
-        public string? UserId { get; set; } // must not allow null i will edit it after create account controller
-        [JsonIgnore]
-        public ApplicationUser? User { get; set; }
+        public string UserId { get; set; } // must not allow null i will edit it after create account controller
+        public ApplicationUser User { get; set; }
     }
 }

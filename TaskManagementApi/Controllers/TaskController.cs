@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Repositories.IRepositories;
 
 namespace TaskManagementApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
@@ -35,6 +37,8 @@ namespace TaskManagementApi.Controllers
         public async Task<IActionResult> Add(TaskDto data)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            data.Id = 0;
 
             await repo.AddAsync(data);
             await repo.SaveAsync();

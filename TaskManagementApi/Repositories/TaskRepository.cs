@@ -24,7 +24,7 @@ namespace TaskManagementApi.Repositories
             task.DueDate = data.DueDate;
             task.Priority = data.Priority;
             task.Status = data.Status;
-            await SaveAsync();
+
         }
 
         public async Task<List<TaskData>> GetAsync()
@@ -54,7 +54,6 @@ namespace TaskManagementApi.Repositories
             var task = await context.Tasks.FindAsync(id);
             if (task == null) return;
             context.Tasks.Remove(task);
-            await SaveAsync();
         }
 
         public async Task SaveAsync()
