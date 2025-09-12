@@ -1,36 +1,65 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Repositories.IRepositories;
 
 namespace TaskManagementApi.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TaskController : ControllerBase
     {
-        private ITaskRepository repo;
-        public TaskController(ITaskRepository repo)
+        private readonly ITaskRepository repo;
+        private readonly ILogger<TaskController> logger;
+        public TaskController(ITaskRepository repo, ILogger<TaskController> logger)
         {
             this.repo = repo;
+            this.logger = logger;
+        }
+
+        private string GetCurrentUserId()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException("User Id Not Found");
+
+            return userId;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var tasks = await repo.GetAsync();
-            if(!tasks.Any()) return NotFound();
-            return Ok(tasks);
+            try
+            {
+                var userId = GetCurrentUserId();
+                var tasks = await repo.GetAsync(userId);
+                if(!tasks.Any()) return NotFound();
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error Retrieving Tasks");
+                return StatusCode(500, "An Error Occurred whlie retrieving tasks");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var task = await repo.GetByIdAsync(id);
-            if(task == null) return NotFound();
+            try
+            {
+                var userId = GetCurrentUserId();
+                var task = await repo.GetByIdAsync(id , userId);
+                if(task == null) return NotFound();
 
-            return Ok(task);
+                return Ok(task);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error retrieving task {TaskId}", id);
+                return StatusCode(500, "An error occurred while retrieving the task");
+            }   
         }
 
         [HttpPost]
@@ -38,13 +67,21 @@ namespace TaskManagementApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            data.Id = 0;
+            try
+            {
+                var userId = GetCurrentUserId();
+                data.Id = 0;
 
-            await repo.AddAsync(data);
-            await repo.SaveAsync();
+                var task = await repo.AddAsync(data , userId);
+                await repo.SaveAsync();
 
-
-            return Created();
+                return CreatedAtAction(nameof(GetById) , new {id = task.Id } , task);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError("Error Creating Task");
+                return StatusCode(500, "an error occurred while creating new task");
+            }
         }
 
         [HttpPut]
@@ -52,22 +89,44 @@ namespace TaskManagementApi.Controllers
         {
             if (id != data.Id || !ModelState.IsValid) return BadRequest();
 
-            await repo.EditAsync(data);
-            await repo.SaveAsync();
+            try
+            {
+                var userId = GetCurrentUserId();
+                var success = await repo.EditAsync(data , userId);
+                if (success != true)
+                    return NotFound($"Task With Id {id} not found or access denied");
+                await repo.SaveAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error updating task {TaskId}", id);
+                return StatusCode(500, "An error occurred while updating the task");
+            }
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id) 
         {
-            var task = await repo.GetByIdAsync(id);
-            if(task == null) return BadRequest();
+            try
+            {
+                var userId = GetCurrentUserId();
+                var success = await repo.RemoveAsync(id , userId);
 
-            await repo.RemoveAsync(id);
-            await repo.SaveAsync();
+                if (success != true)
+                    return NotFound($"Task with ID {id} not found or access denied");
 
-            return NoContent();
+                await repo.SaveAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error deleting task {TaskId}", id);
+                return StatusCode(500, "An error occurred while deleting the task");
+            }
         }
     }
 }

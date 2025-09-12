@@ -15,11 +15,13 @@ namespace TaskManagementApi.Controllers
     {
         private readonly UserManager<ApplicationUser> _user;
         private readonly IConfiguration _config;
-
-        public AccountController(UserManager<ApplicationUser> user, IConfiguration config)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController
+            (UserManager<ApplicationUser> user, IConfiguration config, ILogger<AccountController> logger)
         {
             _user = user;
             _config = config;
+            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -27,18 +29,26 @@ namespace TaskManagementApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var user = new ApplicationUser()
+            try
             {
-                UserName = request.UserName,
-                Email = request.Email
-            };
+                var user = new ApplicationUser()
+                {
+                    UserName = request.UserName,
+                    Email = request.Email
+                };
 
-            var result = await _user.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors.Select(e => e.Description));
+                var result = await _user.CreateAsync(user, request.Password);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors.Select(e => e.Description));
 
 
-            return Ok();
+                return Ok(new {message = "User Register Successfully"});
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error During User Registeration");
+                return StatusCode(500, "An Error Occured During Registeration");
+            }
         }
 
 
@@ -47,14 +57,27 @@ namespace TaskManagementApi.Controllers
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user =await _user.FindByNameAsync(request.UserName);
-            if(user != null &&await _user.CheckPasswordAsync(user , request.Password))
+            try
             {
-                var token = GenerateJwtToken(user);
+                var user =await _user.FindByNameAsync(request.UserName);
+                if(user != null &&await _user.CheckPasswordAsync(user , request.Password))
+                {
+                    var token = GenerateJwtToken(user);
 
-                return Ok(token);
+                    return Ok(new
+                    {
+                        token = token,
+                        userId = user.Id,
+                        userName = user.UserName,
+                        email = user.Email,
+                    });
+                }
             }
-
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error During User Login");
+                return StatusCode(500, "An Error Occured During User Login");
+            }
             return Unauthorized();
         }
 
@@ -62,14 +85,17 @@ namespace TaskManagementApi.Controllers
         {
             List<Claim> userClaim = new List<Claim>
             {
-                new Claim("UserName" , user.UserName)
+                new Claim(ClaimTypes.NameIdentifier , user.Id),
+                new Claim(ClaimTypes.Name , user.UserName ?? ""),
+                new Claim(ClaimTypes.Email , user.Email??"")
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: userClaim,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials : creds

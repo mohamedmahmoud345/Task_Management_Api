@@ -17,7 +17,7 @@ namespace TaskManagementApi.Model
 
 
         [ForeignKey("user")]
-        public string UserId { get; set; } // must not allow null i will edit it after create account controller
+        public string UserId { get; set; } 
         public ApplicationUser User { get; set; }
     }
 }

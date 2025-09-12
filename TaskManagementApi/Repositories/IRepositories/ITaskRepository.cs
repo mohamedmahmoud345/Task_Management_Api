@@ -5,11 +5,11 @@ namespace TaskManagementApi.Repositories.IRepositories
 {
     public interface ITaskRepository
     {
-        public Task<List<TaskData>> GetAsync();
-        public Task<TaskData> GetByIdAsync(int id);
-        public Task AddAsync(TaskDto data);
-        public Task RemoveAsync(int id);
-        public Task EditAsync(TaskDto data);
+        public Task<List<TaskData>> GetAsync(string userId);
+        public Task<TaskData> GetByIdAsync(int id , string UserId);
+        public Task<TaskData> AddAsync(TaskDto data , string UserId);
+        public Task<bool> RemoveAsync(int id, string UserId);
+        public Task<bool> EditAsync(TaskDto data, string UserId);
         public Task SaveAsync();
     }
 }

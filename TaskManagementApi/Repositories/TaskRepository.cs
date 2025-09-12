@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TaskManagementApi.Context;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Model;
@@ -14,10 +16,13 @@ namespace TaskManagementApi.Repositories
             this.context = context;
         }
 
-        public async Task EditAsync(TaskDto data)
+        public async Task<bool> EditAsync(TaskDto data, string userId)
         {
-            var task = await context.Tasks.FindAsync(data.Id);
-            if (task == null) return;
+            if(data == null) throw new ArgumentException(nameof(data));
+            if(string.IsNullOrEmpty(userId)) throw new ArgumentException(nameof(userId));
+            
+            var task = await GetByIdAsync(data.Id , userId);
+            if (task == null) return false;
 
             task.Title = data.Title;
             task.Description = data.Description;
@@ -25,20 +30,25 @@ namespace TaskManagementApi.Repositories
             task.Priority = data.Priority;
             task.Status = data.Status;
 
+            return true;
         }
 
-        public async Task<List<TaskData>> GetAsync()
+        public async Task<List<TaskData>> GetAsync(string userId)
         {
-            return await context.Tasks.ToListAsync();
+            return await context.Tasks.Where(t => t.UserId == userId).OrderBy(t => t.DueDate).ToListAsync();
         }
 
-        public async Task<TaskData> GetByIdAsync(int id)
+        public async Task<TaskData> GetByIdAsync(int id, string userId)
         {
-            return await context.Tasks.FindAsync(id);
+            return await context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
-        public async Task AddAsync(TaskDto data)
+        public async Task<TaskData> AddAsync(TaskDto data, string userId)
         {
-            if(data == null) return;
+            if(data == null) 
+                throw new ArgumentException(nameof(data));
+            if(string.IsNullOrEmpty(userId))
+                throw new ArgumentException(nameof(userId));
+
             var task = new TaskData
             {
                 Title = data.Title,
@@ -46,14 +56,24 @@ namespace TaskManagementApi.Repositories
                 DueDate = data.DueDate,
                 Priority = data.Priority,
                 Status = data.Status,
+                UserId = userId
             };
             await context.Tasks.AddAsync(task);
+
+            return task;
         }
-        public async Task RemoveAsync(int id)
+        public async Task<bool> RemoveAsync(int id, string UserId)
         {
-            var task = await context.Tasks.FindAsync(id);
-            if (task == null) return;
+            if (string.IsNullOrEmpty(UserId))
+                throw new ArgumentException(nameof(UserId));
+
+            var task = await context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == UserId);
+
+            if (task == null)
+                return false;
+
             context.Tasks.Remove(task);
+            return true;
         }
 
         public async Task SaveAsync()
