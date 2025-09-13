@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using TaskManagementApi.Context;
 using TaskManagementApi.DTO;
+using TaskManagementApi.Extensions;
 using TaskManagementApi.Model;
 using TaskManagementApi.Repositories.IRepositories;
 
@@ -49,15 +49,7 @@ namespace TaskManagementApi.Repositories
             if(string.IsNullOrEmpty(userId))
                 throw new ArgumentException(nameof(userId));
 
-            var task = new TaskData
-            {
-                Title = data.Title,
-                Description = data.Description,
-                DueDate = data.DueDate,
-                Priority = data.Priority,
-                Status = data.Status,
-                UserId = userId
-            };
+            var task = data.ToModel(userId );
             await context.Tasks.AddAsync(task);
 
             return task;

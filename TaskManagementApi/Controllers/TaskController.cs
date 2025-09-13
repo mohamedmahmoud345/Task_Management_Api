@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Repositories.IRepositories;
+using TaskManagementApi.Extensions;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace TaskManagementApi.Controllers
 {
@@ -35,7 +37,7 @@ namespace TaskManagementApi.Controllers
                 var userId = GetCurrentUserId();
                 var tasks = await repo.GetAsync(userId);
                 if(!tasks.Any()) return NotFound();
-                return Ok(tasks);
+                return Ok(tasks.ToDto());
             }
             catch (Exception ex)
             {
@@ -53,7 +55,7 @@ namespace TaskManagementApi.Controllers
                 var task = await repo.GetByIdAsync(id , userId);
                 if(task == null) return NotFound();
 
-                return Ok(task);
+                return Ok(task.ToDto());
             }
             catch (Exception ex)
             {
@@ -75,7 +77,7 @@ namespace TaskManagementApi.Controllers
                 var task = await repo.AddAsync(data , userId);
                 await repo.SaveAsync();
 
-                return CreatedAtAction(nameof(GetById) , new {id = task.Id } , task);
+                return CreatedAtAction(nameof(GetById) , new {id = task.Id } , task.ToDto());
             }
             catch(Exception ex)
             {
@@ -84,7 +86,7 @@ namespace TaskManagementApi.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Edit(int id , TaskDto data)
         {
             if (id != data.Id || !ModelState.IsValid) return BadRequest();
@@ -107,7 +109,7 @@ namespace TaskManagementApi.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id) 
         {
             try
