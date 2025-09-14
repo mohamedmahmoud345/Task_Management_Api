@@ -4,6 +4,8 @@ using TaskManagementApi.DTO;
 using TaskManagementApi.Repositories.IRepositories;
 using TaskManagementApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 
 namespace TaskManagementApi.Controllers
@@ -128,6 +130,73 @@ namespace TaskManagementApi.Controllers
             {
                 logger.LogError(ex, "Error deleting task {TaskId}", id);
                 return StatusCode(500, "An error occurred while deleting the task");
+            }
+        }
+
+        // Task filtering (by status, priority)
+
+        [HttpGet("filter/status/{statusNumber:int}")]
+        public async Task<IActionResult> GetByStatus(int statusNumber)
+        {
+            try
+            {
+                if(statusNumber < 0 || statusNumber > 3) return BadRequest();
+                var userId = GetCurrentUserId();
+
+                var tasks = await repo.FilterByStatus(statusNumber, userId);
+
+                if (!tasks.Any())
+                    return NotFound();
+
+                return Ok(tasks.ToDto());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error on filtartion by status");
+                return StatusCode(500, "an error occured while status filtration");
+            }
+        }
+
+        [HttpGet("filter/priority/{priorityNumber:int}")]
+        public async Task<IActionResult> GetByPriority(int priorityNumber)
+        {
+            try
+            {
+                if(priorityNumber < 0 || priorityNumber > 3) return BadRequest();
+                var userId = GetCurrentUserId();
+
+                var tasks = await repo.FilterByPriority(priorityNumber, userId);
+
+                if (!tasks.Any())
+                    return NotFound();
+
+                return Ok(tasks.ToDto());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error on filtartion by priority");
+                return StatusCode(500, "an error occured while priority filtration");
+            }
+        }
+
+        // add search by title 
+        [HttpGet("search/{title}")]
+        public async Task<IActionResult> SearchByTitle(string title)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var tasks = await repo.SearchByTitle(title.ToLower(), userId);
+
+                if (!tasks.Any())
+                    return NotFound();
+
+                return Ok(tasks.ToDto());
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "error on search action");
+                return StatusCode(500, "An error occured while searching");
             }
         }
     }
