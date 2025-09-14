@@ -67,6 +67,22 @@ namespace TaskManagementApi.Repositories
             context.Tasks.Remove(task);
             return true;
         }
+        public async Task<List<TaskData>> FilterByStatus(int statusNumber , string userId)
+        {
+            return 
+                await context.Tasks.Where(t => (int)t.Status == statusNumber && t.UserId == userId).ToListAsync();
+        }
+        public async Task<List<TaskData>> FilterByPriority(int priorityNumber , string userId)
+        {
+            return 
+                await context.Tasks.Where(t => (int)t.Priority == priorityNumber &&  t.UserId == userId).ToListAsync();
+        }
+
+        public async Task<List<TaskData>> SearchByTitle(string title , string userId)
+        {
+            return
+                await context.Tasks.Where(task => task.Title.ToLower() == title).OrderBy(x => x.DueDate).ToListAsync();
+        }
 
         public async Task SaveAsync()
         {
