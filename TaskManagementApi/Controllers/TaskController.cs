@@ -151,7 +151,7 @@ namespace TaskManagementApi.Controllers
                 if (!tasks.Any())
                     return NotFound();
 
-                return Ok(Pagination(tasks));
+                return Ok(Pagination(tasks , pageNumber , pageSize));
             }
             catch (Exception ex)
             {
