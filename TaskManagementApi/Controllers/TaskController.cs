@@ -6,6 +6,7 @@ using TaskManagementApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using TaskManagementApi.Model;
 
 
 namespace TaskManagementApi.Controllers
@@ -32,14 +33,15 @@ namespace TaskManagementApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] int pageNumber=1 , [FromQuery] int pageSize = 5)
         {
             try
             {
                 var userId = GetCurrentUserId();
                 var tasks = await repo.GetAsync(userId);
                 if(!tasks.Any()) return NotFound();
-                return Ok(tasks.ToDto());
+
+                return Ok(Pagination(tasks , pageNumber , pageSize));
             }
             catch (Exception ex)
             {
@@ -136,7 +138,8 @@ namespace TaskManagementApi.Controllers
         // Task filtering (by status, priority)
 
         [HttpGet("filter/status/{statusNumber:int}")]
-        public async Task<IActionResult> GetByStatus(int statusNumber)
+        public async Task<IActionResult> GetByStatus
+            (int statusNumber , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
@@ -148,7 +151,7 @@ namespace TaskManagementApi.Controllers
                 if (!tasks.Any())
                     return NotFound();
 
-                return Ok(tasks.ToDto());
+                return Ok(Pagination(tasks));
             }
             catch (Exception ex)
             {
@@ -158,7 +161,8 @@ namespace TaskManagementApi.Controllers
         }
 
         [HttpGet("filter/priority/{priorityNumber:int}")]
-        public async Task<IActionResult> GetByPriority(int priorityNumber)
+        public async Task<IActionResult> GetByPriority
+            (int priorityNumber , [FromQuery] int pageNumber = 1 , [FromQuery] int pageSize = 5)
         {
             try
             {
@@ -170,7 +174,7 @@ namespace TaskManagementApi.Controllers
                 if (!tasks.Any())
                     return NotFound();
 
-                return Ok(tasks.ToDto());
+                return Ok(Pagination(tasks, pageNumber , pageSize));
             }
             catch (Exception ex)
             {
@@ -181,7 +185,8 @@ namespace TaskManagementApi.Controllers
 
         // add search by title 
         [HttpGet("search/{title}")]
-        public async Task<IActionResult> SearchByTitle(string title)
+        public async Task<IActionResult> SearchByTitle
+            (string title , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
@@ -191,13 +196,27 @@ namespace TaskManagementApi.Controllers
                 if (!tasks.Any())
                     return NotFound();
 
-                return Ok(tasks.ToDto());
+                return Ok(Pagination(tasks, pageNumber , pageSize));
             }
             catch(Exception ex)
             {
                 logger.LogError(ex, "error on search action");
                 return StatusCode(500, "An error occured while searching");
             }
+        }
+
+        private List<TaskDto> Pagination
+            (List<TaskData> tasks , int pageNumber , int pageSize)
+        {
+            var count = tasks.Count();
+
+            var pageNumbers =(int) Math.Ceiling((double)(pageNumber - 1) * pageSize);
+
+            var result = tasks.Skip(pageNumbers)
+                .Take(pageSize)
+                .ToList();
+
+            return result.ToDto();
         }
     }
 }
