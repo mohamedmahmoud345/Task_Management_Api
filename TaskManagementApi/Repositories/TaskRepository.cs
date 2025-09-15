@@ -73,30 +73,18 @@ namespace TaskManagementApi.Repositories
         public async Task<List<TaskData>> FilterByStatus(int statusNumber , string userId)
         {
             return 
-<<<<<<< HEAD
                 await context.Tasks.AsNoTracking().Where(t => (int)t.Status == statusNumber && t.UserId == userId).ToListAsync();
-=======
-                await context.Tasks.Where(t => (int)t.Status == statusNumber && t.UserId == userId).ToListAsync();
->>>>>>> 288fe71ac09d10e73e528800acb5ef3ff59492f1
         }
         public async Task<List<TaskData>> FilterByPriority(int priorityNumber , string userId)
         {
             return 
-<<<<<<< HEAD
                 await context.Tasks.AsNoTracking().Where(t => (int)t.Priority == priorityNumber &&  t.UserId == userId).ToListAsync();
-=======
-                await context.Tasks.Where(t => (int)t.Priority == priorityNumber &&  t.UserId == userId).ToListAsync();
->>>>>>> 288fe71ac09d10e73e528800acb5ef3ff59492f1
         }
 
         public async Task<List<TaskData>> SearchByTitle(string title , string userId)
         {
             return
-<<<<<<< HEAD
                 await context.Tasks.AsNoTracking().Where(task => task.Title.ToLower() == title).OrderBy(x => x.DueDate).ToListAsync();
-=======
-                await context.Tasks.Where(task => task.Title.ToLower() == title).OrderBy(x => x.DueDate).ToListAsync();
->>>>>>> 288fe71ac09d10e73e528800acb5ef3ff59492f1
         }
 
         public async Task SaveAsync()
