@@ -211,7 +211,7 @@ namespace TaskManagementApi.Controllers
         {
             var count = tasks.Count();
 
-            var pageNumbers =(int) Math.Ceiling((double)(pageNumber - 1) * pageSize);
+            var pageNumbers = (pageNumber - 1) * pageSize;
 
             var result = tasks.Skip(pageNumbers)
                 .Take(pageSize)

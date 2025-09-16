@@ -84,7 +84,7 @@ namespace TaskManagementApi.Repositories
         public async Task<List<TaskData>> SearchByTitle(string title , string userId)
         {
             return
-                await context.Tasks.AsNoTracking().Where(task => task.Title.ToLower() == title).OrderBy(x => x.DueDate).ToListAsync();
+                await context.Tasks.AsNoTracking().Where(task => task.Title.ToLower().Contains(title)&& task.UserId == userId).OrderBy(x => x.DueDate).ToListAsync();
         }
 
         public async Task SaveAsync()
