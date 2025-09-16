@@ -4,3 +4,4 @@ bin/
 obj/
 
 *.csproj.user
+wwwroot/Uploads/
