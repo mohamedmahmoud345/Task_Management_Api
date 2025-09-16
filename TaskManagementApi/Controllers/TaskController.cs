@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using TaskManagementApi.DTO;
-using TaskManagementApi.Repositories.IRepositories;
-using TaskManagementApi.Extensions;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using TaskManagementApi.DTO;
+using TaskManagementApi.Extensions;
 using TaskManagementApi.Model;
+using TaskManagementApi.Repositories.IRepositories;
 
 
 namespace TaskManagementApi.Controllers

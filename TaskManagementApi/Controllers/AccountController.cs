@@ -59,6 +59,7 @@ namespace TaskManagementApi.Controllers
 
             try
             {
+
                 var user =await _user.FindByNameAsync(request.UserName);
                 if(user != null &&await _user.CheckPasswordAsync(user , request.Password))
                 {
