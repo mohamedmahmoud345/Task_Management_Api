@@ -19,6 +19,17 @@ builder.Services.AddEndpointsApiExplorer();
 // In Program.cs - Basic Auth configuration
 builder.Services.AddSwaggerGen();
 
+var corsStr = "AllowFrontend";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsStr, policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("conStr"));
@@ -71,7 +82,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(corsStr);
+
 app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
