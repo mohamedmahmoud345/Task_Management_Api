@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Model;
@@ -136,8 +133,6 @@ namespace TaskManagementApi.Controllers
             }
         }
 
-        // Task filtering (by status, priority)
-
         [HttpGet("filter/status/{statusNumber:int}")]
         public async Task<IActionResult> GetByStatus
             (int statusNumber , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
@@ -184,7 +179,6 @@ namespace TaskManagementApi.Controllers
             }
         }
 
-        // add search by title 
         [HttpGet("search/{title}")]
         public async Task<IActionResult> SearchByTitle
             (string title , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)

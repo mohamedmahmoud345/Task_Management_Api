@@ -1,16 +1,8 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Authentication;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Model;
@@ -122,6 +114,31 @@ namespace TaskManagementApi.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Error while return the profile photo");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpGet("delete-photo")]
+        public async Task<IActionResult> DeletePhoto()
+        {
+            try
+            {
+                var userId = GetUserId();
+                var user = await repo.GetUserById(userId);
+
+                if (user.ProfilePicturePath is null)
+                    return BadRequest("The user doesn't have a photo.");
+
+                var path = Path.Combine(environment.WebRootPath, "UpLoads", user.ProfilePicturePath);
+
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "error while delete photo endpoint");
                 return StatusCode(500, "Internal Server Error");
             }
         }

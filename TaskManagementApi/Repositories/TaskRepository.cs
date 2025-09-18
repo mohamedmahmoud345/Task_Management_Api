@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManagementApi.Context;
 using TaskManagementApi.DTO;
 using TaskManagementApi.Extensions;
