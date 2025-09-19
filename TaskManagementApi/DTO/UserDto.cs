@@ -4,9 +4,11 @@ namespace TaskManagementApi.DTO
 {
     public class UserDto
     {
-        [Required]
+        [Required(ErrorMessage =  "User Name Is Required")]
+        [StringLength(100 , MinimumLength = 6 , ErrorMessage = "Name Must Be Between 5 to 100")]
         public string UserName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Please Enter The Password")]
         public string Password { get; set; }
     }
 }
