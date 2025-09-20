@@ -9,6 +9,12 @@ using TaskManagementApi.Repositories.IRepositories;
 
 namespace TaskManagementApi.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for managing tasks
+    /// </summary>
+    /// <remarks>This controller handles task-related operations for the authenticated user.  All endpoints
+    /// require the user to be authorized and authenticated.  Tasks are scoped to the current user, and operations will
+    /// only affect tasks owned by the user.</remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -30,6 +36,15 @@ namespace TaskManagementApi.Controllers
             return userId;
         }
 
+        /// <summary>
+        /// Retrieves a paginated list of tasks for the authenticated user
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve (default: 1)</param>
+        /// <param name="pageSize">The number of tasks per page (default: 5)</param>
+        /// <returns>A paginated list of task DTOs</returns>
+        /// <response code="200">Returns the list of tasks</response>
+        /// <response code="404">No tasks found for the user</response>
+        /// <response code="500">An error occurred while retrieving tasks</response>
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] int pageNumber=1 , [FromQuery] int pageSize = 5)
         {
@@ -47,7 +62,14 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "An Error Occurred whlie retrieving tasks");
             }
         }
-
+        /// <summary>
+        /// Retrieves a specific task by ID for the authenticated user
+        /// </summary>
+        /// <param name="id">The ID of the task to retrieve</param>
+        /// <returns>The task DTO if found</returns>
+        /// <response code="200">Returns the requested task</response>
+        /// <response code="404">Task not found or access denied</response>
+        /// <response code="500">An error occurred while retrieving the task</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -65,7 +87,14 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "An error occurred while retrieving the task");
             }   
         }
-
+        /// <summary>
+        /// Creates a new task for the authenticated user
+        /// </summary>
+        /// <param name="data">The task data to create</param>
+        /// <returns>The created task DTO</returns>
+        /// <response code="201">Task created successfully</response>
+        /// <response code="400">Invalid task data provided</response>
+        /// <response code="500">An error occurred while creating the task</response>
         [HttpPost]
         public async Task<IActionResult> Add(TaskDto data)
         {
@@ -87,7 +116,16 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "an error occurred while creating new task");
             }
         }
-
+        /// <summary>
+        /// Updates an existing task for the authenticated user
+        /// </summary>
+        /// <param name="id">The ID of the task to update</param>
+        /// <param name="data">The updated task data</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Task updated successfully</response>
+        /// <response code="400">Invalid task data or ID mismatch</response>
+        /// <response code="404">Task not found or access denied</response>
+        /// <response code="500">An error occurred while updating the task</response>
         [HttpPut("{id}")]
         public async Task<IActionResult> Edit(int id , TaskDto data)
         {
@@ -110,7 +148,14 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "An error occurred while updating the task");
             }
         }
-
+        /// <summary>
+        /// Deletes a task for the authenticated user
+        /// </summary>
+        /// <param name="id">The ID of the task to delete</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Task deleted successfully</response>
+        /// <response code="404">Task not found or access denied</response>
+        /// <response code="500">An error occurred while deleting the task</response>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id) 
         {
@@ -132,7 +177,17 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "An error occurred while deleting the task");
             }
         }
-
+        /// <summary>
+        /// Retrieves tasks filtered by status for the authenticated user
+        /// </summary>
+        /// <param name="statusNumber">The status number to filter by (0-3)</param>
+        /// <param name="pageNumber">The page number to retrieve (default: 1)</param>
+        /// <param name="pageSize">The number of tasks per page (default: 5)</param>
+        /// <returns>A paginated list of filtered task DTOs</returns>
+        /// <response code="200">Returns the filtered list of tasks</response>
+        /// <response code="400">Invalid status number provided</response>
+        /// <response code="404">No tasks found with the specified status</response>
+        /// <response code="500">An error occurred while filtering tasks</response>
         [HttpGet("filter/status/{statusNumber:int}")]
         public async Task<IActionResult> GetByStatus
             (int statusNumber , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
@@ -155,7 +210,17 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "an error occured while status filtration");
             }
         }
-
+        /// <summary>
+        /// Retrieves tasks filtered by priority for the authenticated user
+        /// </summary>
+        /// <param name="priorityNumber">The priority number to filter by (0-3)</param>
+        /// <param name="pageNumber">The page number to retrieve (default: 1)</param>
+        /// <param name="pageSize">The number of tasks per page (default: 5)</param>
+        /// <returns>A paginated list of filtered task DTOs</returns>
+        /// <response code="200">Returns the filtered list of tasks</response>
+        /// <response code="400">Invalid priority number provided</response>
+        /// <response code="404">No tasks found with the specified priority</response>
+        /// <response code="500">An error occurred while filtering tasks</response>
         [HttpGet("filter/priority/{priorityNumber:int}")]
         public async Task<IActionResult> GetByPriority
             (int priorityNumber , [FromQuery] int pageNumber = 1 , [FromQuery] int pageSize = 5)
@@ -178,7 +243,16 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "an error occured while priority filtration");
             }
         }
-
+        /// <summary>
+        /// Searches tasks by title for the authenticated user
+        /// </summary>
+        /// <param name="title">The title search term</param>
+        /// <param name="pageNumber">The page number to retrieve (default: 1)</param>
+        /// <param name="pageSize">The number of tasks per page (default: 5)</param>
+        /// <returns>A paginated list of matching task DTOs</returns>
+        /// <response code="200">Returns the search results</response>
+        /// <response code="404">No tasks found matching the search term</response>
+        /// <response code="500">An error occurred while searching tasks</response>
         [HttpGet("search/{title}")]
         public async Task<IActionResult> SearchByTitle
             (string title , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)

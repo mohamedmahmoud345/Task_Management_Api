@@ -20,6 +20,175 @@
             <response code = "500">Internal server error</response>
         </member>
         <!-- Badly formed XML comment ignored for member "M:TaskManagementApi.Controllers.AccountController.Login(TaskManagementApi.DTO.UserDto)" -->
+        <member name="T:TaskManagementApi.Controllers.TaskController">
+            <summary>
+            Provides endpoints for managing tasks
+            </summary>
+            <remarks>This controller handles task-related operations for the authenticated user.  All endpoints
+            require the user to be authorized and authenticated.  Tasks are scoped to the current user, and operations will
+            only affect tasks owned by the user.</remarks>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.Get(System.Int32,System.Int32)">
+            <summary>
+            Retrieves a paginated list of tasks for the authenticated user
+            </summary>
+            <param name="pageNumber">The page number to retrieve (default: 1)</param>
+            <param name="pageSize">The number of tasks per page (default: 5)</param>
+            <returns>A paginated list of task DTOs</returns>
+            <response code="200">Returns the list of tasks</response>
+            <response code="404">No tasks found for the user</response>
+            <response code="500">An error occurred while retrieving tasks</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.GetById(System.Int32)">
+            <summary>
+            Retrieves a specific task by ID for the authenticated user
+            </summary>
+            <param name="id">The ID of the task to retrieve</param>
+            <returns>The task DTO if found</returns>
+            <response code="200">Returns the requested task</response>
+            <response code="404">Task not found or access denied</response>
+            <response code="500">An error occurred while retrieving the task</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.Add(TaskManagementApi.DTO.TaskDto)">
+            <summary>
+            Creates a new task for the authenticated user
+            </summary>
+            <param name="data">The task data to create</param>
+            <returns>The created task DTO</returns>
+            <response code="201">Task created successfully</response>
+            <response code="400">Invalid task data provided</response>
+            <response code="500">An error occurred while creating the task</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.Edit(System.Int32,TaskManagementApi.DTO.TaskDto)">
+            <summary>
+            Updates an existing task for the authenticated user
+            </summary>
+            <param name="id">The ID of the task to update</param>
+            <param name="data">The updated task data</param>
+            <returns>No content if successful</returns>
+            <response code="204">Task updated successfully</response>
+            <response code="400">Invalid task data or ID mismatch</response>
+            <response code="404">Task not found or access denied</response>
+            <response code="500">An error occurred while updating the task</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.Delete(System.Int32)">
+            <summary>
+            Deletes a task for the authenticated user
+            </summary>
+            <param name="id">The ID of the task to delete</param>
+            <returns>No content if successful</returns>
+            <response code="204">Task deleted successfully</response>
+            <response code="404">Task not found or access denied</response>
+            <response code="500">An error occurred while deleting the task</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.GetByStatus(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Retrieves tasks filtered by status for the authenticated user
+            </summary>
+            <param name="statusNumber">The status number to filter by (0-3)</param>
+            <param name="pageNumber">The page number to retrieve (default: 1)</param>
+            <param name="pageSize">The number of tasks per page (default: 5)</param>
+            <returns>A paginated list of filtered task DTOs</returns>
+            <response code="200">Returns the filtered list of tasks</response>
+            <response code="400">Invalid status number provided</response>
+            <response code="404">No tasks found with the specified status</response>
+            <response code="500">An error occurred while filtering tasks</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.GetByPriority(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Retrieves tasks filtered by priority for the authenticated user
+            </summary>
+            <param name="priorityNumber">The priority number to filter by (0-3)</param>
+            <param name="pageNumber">The page number to retrieve (default: 1)</param>
+            <param name="pageSize">The number of tasks per page (default: 5)</param>
+            <returns>A paginated list of filtered task DTOs</returns>
+            <response code="200">Returns the filtered list of tasks</response>
+            <response code="400">Invalid priority number provided</response>
+            <response code="404">No tasks found with the specified priority</response>
+            <response code="500">An error occurred while filtering tasks</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.TaskController.SearchByTitle(System.String,System.Int32,System.Int32)">
+            <summary>
+            Searches tasks by title for the authenticated user
+            </summary>
+            <param name="title">The title search term</param>
+            <param name="pageNumber">The page number to retrieve (default: 1)</param>
+            <param name="pageSize">The number of tasks per page (default: 5)</param>
+            <returns>A paginated list of matching task DTOs</returns>
+            <response code="200">Returns the search results</response>
+            <response code="404">No tasks found matching the search term</response>
+            <response code="500">An error occurred while searching tasks</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.UploadPhoto(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads a profile photo for the authenticated user
+            </summary>
+            <param name="file">The image file to upload (JPG or PNG, max 10MB)</param>
+            <returns>Information about the uploaded file</returns>
+            <response code="200">Photo uploaded successfully</response>
+            <response code="400">Invalid file type, size, or no file provided</response>
+            <response code="500">An error occurred while uploading the photo</response>   
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.GetPhoto">
+            <summary>
+            Retrieves the profile photo URL for the authenticated user
+            </summary>
+            <returns>The URL of the user's profile photo</returns>
+            <response code="200">Returns the profile photo URL</response>
+            <response code="404">No profile photo found for the user</response>
+            <response code="500">An error occurred while retrieving the photo</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.DeletePhoto">
+            <summary>
+            Deletes the profile photo for the authenticated user
+            </summary>
+            <returns>No content if successful</returns>
+            <response code="200">Photo deleted successfully</response>
+            <response code="400">User doesn't have a profile photo</response>
+            <response code="500">An error occurred while deleting the photo</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.ChangeName(TaskManagementApi.DTO.NameDto)">
+            <summary>
+            Changes the display name for the authenticated user
+            </summary>
+            <param name="nameDto">The new name data</param>
+            <returns>No content if successful</returns>
+            <response code="204">Name changed successfully</response>
+            <response code="400">Invalid name data or update failed</response>
+            <response code="404">User not found</response>
+            <response code="500">An error occurred while changing the name</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.ChangeEmail(System.String)">
+            <summary>
+            Changes the email address for the authenticated user
+            </summary>
+            <param name="newEmail">The new email address</param>
+            <returns>No content if successful</returns>
+            <response code="204">Email changed successfully</response>
+            <response code="400">Invalid email format or update failed</response>
+            <response code="404">User not found</response>
+            <response code="500">An error occurred while changing the email</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.ResetPassword(TaskManagementApi.DTO.ChangePasswordDto)">
+            <summary>
+            Resets the password for the authenticated user
+            </summary>
+            <param name="passwordDto">The password change data containing old and new passwords</param>
+            <returns>No content if successful</returns>
+            <response code="204">Password changed successfully</response>
+            <response code="400">Password change failed</response>
+            <response code="401">Old password is incorrect</response>
+            <response code="500">An error occurred while resetting the password</response>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.UserController.GetProfile">
+            <summary>
+            Retrieves the profile information for the authenticated user
+            </summary>
+            <returns>The user's profile information including ID, name, email, and profile picture URL</returns>
+            <response code="200">Returns the user profile information</response>
+            <response code="404">User not found</response>
+            <response code="500">An error occurred while retrieving the profile</response>
+        </member>
         <member name="T:TaskManagementApi.Migrations.initial">
             <inheritdoc />
         </member>

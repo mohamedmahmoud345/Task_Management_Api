@@ -37,7 +37,14 @@ namespace TaskManagementApi.Controllers
             return userId;
         }
 
-        // upload file 
+        /// <summary>
+        /// Uploads a profile photo for the authenticated user
+        /// </summary>
+        /// <param name="file">The image file to upload (JPG or PNG, max 10MB)</param>
+        /// <returns>Information about the uploaded file</returns>
+        /// <response code="200">Photo uploaded successfully</response>
+        /// <response code="400">Invalid file type, size, or no file provided</response>
+        /// <response code="500">An error occurred while uploading the photo</response>   
         [HttpPost("upload-photo")]
         public async Task<IActionResult> UploadPhoto(IFormFile file)
         {
@@ -94,7 +101,13 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Retrieves the profile photo URL for the authenticated user
+        /// </summary>
+        /// <returns>The URL of the user's profile photo</returns>
+        /// <response code="200">Returns the profile photo URL</response>
+        /// <response code="404">No profile photo found for the user</response>
+        /// <response code="500">An error occurred while retrieving the photo</response>
         [HttpGet("Profile-Photo")]
         public async Task<IActionResult> GetPhoto()
         {
@@ -117,7 +130,13 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Deletes the profile photo for the authenticated user
+        /// </summary>
+        /// <returns>No content if successful</returns>
+        /// <response code="200">Photo deleted successfully</response>
+        /// <response code="400">User doesn't have a profile photo</response>
+        /// <response code="500">An error occurred while deleting the photo</response>
         [HttpGet("delete-photo")]
         public async Task<IActionResult> DeletePhoto()
         {
@@ -142,7 +161,15 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Changes the display name for the authenticated user
+        /// </summary>
+        /// <param name="nameDto">The new name data</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Name changed successfully</response>
+        /// <response code="400">Invalid name data or update failed</response>
+        /// <response code="404">User not found</response>
+        /// <response code="500">An error occurred while changing the name</response>
         [HttpPut("Change-Name")]
         public async Task<IActionResult> ChangeName(NameDto nameDto)
         {
@@ -166,7 +193,15 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Changes the email address for the authenticated user
+        /// </summary>
+        /// <param name="newEmail">The new email address</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Email changed successfully</response>
+        /// <response code="400">Invalid email format or update failed</response>
+        /// <response code="404">User not found</response>
+        /// <response code="500">An error occurred while changing the email</response>
         [HttpPut("Change-Email/{newEmail}")]
         public async Task<IActionResult> ChangeEmail(string newEmail)
         {
@@ -197,7 +232,15 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Resets the password for the authenticated user
+        /// </summary>
+        /// <param name="passwordDto">The password change data containing old and new passwords</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Password changed successfully</response>
+        /// <response code="400">Password change failed</response>
+        /// <response code="401">Old password is incorrect</response>
+        /// <response code="500">An error occurred while resetting the password</response>
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword
             (ChangePasswordDto passwordDto)
@@ -226,7 +269,13 @@ namespace TaskManagementApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Retrieves the profile information for the authenticated user
+        /// </summary>
+        /// <returns>The user's profile information including ID, name, email, and profile picture URL</returns>
+        /// <response code="200">Returns the user profile information</response>
+        /// <response code="404">User not found</response>
+        /// <response code="500">An error occurred while retrieving the profile</response>
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
