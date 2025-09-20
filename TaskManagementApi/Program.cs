@@ -22,7 +22,49 @@ builder.Services.AddControllers()
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 // In Program.cs - Basic Auth configuration
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Task Management Api",
+        Version = "v1",
+        Description = "An Api for managing tasks with user authentication",
+        Contact = new OpenApiContact
+        {
+            Name = "Api Support",
+            Email = "support@taskmanagement.com"
+        }
+    });
+
+    // configure JWT authentication in swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT authorization header using the bearer schema: Example: \"Authorization : Bearer {Token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"  // References the security definition above
+                }
+            },
+            Array.Empty<string>()  // No scope requirements
+        }
+    });
+
+    var xmlFile = "docs.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath , includeControllerXmlComments: true);
+});
 
 var corsStr = "AllowFrontend";
 builder.Services.AddCors(options =>

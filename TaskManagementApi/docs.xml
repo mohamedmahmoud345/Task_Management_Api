@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TaskManagementApi</name>
+    </assembly>
+    <members>
+        <member name="T:TaskManagementApi.Controllers.AccountController">
+            <summary>
+            Handles user authenitcation and account management
+            </summary>
+        </member>
+        <member name="M:TaskManagementApi.Controllers.AccountController.Register(TaskManagementApi.DTO.RegisterDto)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="request">user registration details</param>
+            <returns>Success message if registration is successful</returns>
+            <response code = "200">User registered successfully</response>
+            <response code = "400">Invalid registration data</response>
+            <response code = "500">Internal server error</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:TaskManagementApi.Controllers.AccountController.Login(TaskManagementApi.DTO.UserDto)" -->
+        <member name="T:TaskManagementApi.Migrations.initial">
+            <inheritdoc />
+        </member>
+        <member name="M:TaskManagementApi.Migrations.initial.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:TaskManagementApi.Migrations.initial.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:TaskManagementApi.Migrations.initial.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

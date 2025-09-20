@@ -9,6 +9,9 @@ using TaskManagementApi.Model;
 
 namespace TaskManagementApi.Controllers
 {
+    /// <summary>
+    /// Handles user authenitcation and account management
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -24,7 +27,18 @@ namespace TaskManagementApi.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Register a new user
+        /// </summary>
+        /// <param name="request">user registration details</param>
+        /// <returns>Success message if registration is successful</returns>
+        /// <response code = "200">User registered successfully</response>
+        /// <response code = "400">Invalid registration data</response>
+        /// <response code = "500">Internal server error</response>
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register(RegisterDto request)
         {
             if (!ModelState.IsValid)
@@ -51,8 +65,18 @@ namespace TaskManagementApi.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Authenticate user and generate JWT token 
+        /// </summary>
+        /// <param name="request">User login credentials</param>
+        /// <returns>JWT token and user information</returns>
+        /// <response code = "200">Returns the JWT token and user details</reponse> 
+        /// <response code = "400">Invalid credentials</response>
+        /// <response code = "500">Internal server error</response>
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login(UserDto request)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);

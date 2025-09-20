@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\progg\TaskManagementApi\TaskManagementApi\docs.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
