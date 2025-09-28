@@ -1,7 +1,7 @@
-﻿using TaskManagementApi.DTO;
-using TaskManagementApi.Model;
+﻿using TaskManagement.Api.DTO;
+using TaskManagement.Api.Model;
 
-namespace TaskManagementApi.Repositories.IRepositories
+namespace TaskManagement.Api.Repositories.IRepositories
 {
     public interface ITaskRepository
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskManagementApi.Model;
+using TaskManagement.Api.Model;
 
-namespace TaskManagementApi.Context
+namespace TaskManagement.Api.Context
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

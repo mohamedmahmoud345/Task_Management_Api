@@ -1,7 +1,7 @@
-﻿using TaskManagementApi.DTO;
-using TaskManagementApi.Model;
+﻿using TaskManagement.Api.DTO;
+using TaskManagement.Api.Model;
 
-namespace TaskManagementApi.Extensions
+namespace TaskManagement.Api.Extensions
 {
     public static class TaskExtensions
     {

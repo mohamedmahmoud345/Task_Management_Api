@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TaskManagementApi.Context;
-using TaskManagementApi.DTO;
-using TaskManagementApi.Extensions;
-using TaskManagementApi.Model;
-using TaskManagementApi.Repositories.IRepositories;
+using TaskManagement.Api.Context;
+using TaskManagement.Api.DTO;
+using TaskManagement.Api.Extensions;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Repositories.IRepositories;
 
-namespace TaskManagementApi.Repositories
+namespace TaskManagement.Api.Repositories
 {
     public class TaskRepository : ITaskRepository
     {

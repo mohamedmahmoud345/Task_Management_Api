@@ -1,4 +1,4 @@
-﻿namespace TaskManagementApi.Enums
+﻿namespace TaskManagement.Api.Enums
 {
     public enum StatusEnum
     {

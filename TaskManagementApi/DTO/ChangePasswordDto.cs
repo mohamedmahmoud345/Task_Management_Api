@@ -1,4 +1,4 @@
-﻿namespace TaskManagementApi.DTO
+﻿namespace TaskManagement.Api.DTO
 {
     public class ChangePasswordDto
     {

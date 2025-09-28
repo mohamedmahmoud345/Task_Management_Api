@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TaskManagementApi.Enums;
+using TaskManagement.Api.Enums;
 
-namespace TaskManagementApi.DTO
+namespace TaskManagement.Api.DTO
 {
     public class TaskDto
     {

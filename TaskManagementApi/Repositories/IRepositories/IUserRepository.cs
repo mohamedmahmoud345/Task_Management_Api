@@ -1,6 +1,6 @@
-﻿using TaskManagementApi.Model;
+﻿using TaskManagement.Api.Model;
 
-namespace TaskManagementApi.Repositories.IRepositories
+namespace TaskManagement.Api.Repositories.IRepositories
 {
     public interface IUserRepository
     {

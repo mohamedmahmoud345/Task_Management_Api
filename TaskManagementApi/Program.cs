@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using TaskManagementApi.Context;
-using TaskManagementApi.Model;
-using TaskManagementApi.Repositories;
-using TaskManagementApi.Repositories.IRepositories;
+using TaskManagement.Api.Context;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Repositories;
+using TaskManagement.Api.Repositories.IRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

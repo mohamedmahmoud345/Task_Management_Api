@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using TaskManagementApi.Enums;
+using TaskManagement.Api.Enums;
 
-namespace TaskManagementApi.Model
+namespace TaskManagement.Api.Model
 {
     public class TaskData
     {

@@ -1,7 +1,7 @@
 ﻿using Azure;
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementApi.DTO
+namespace TaskManagement.Api.DTO
 {
     public class RegisterDto
     {

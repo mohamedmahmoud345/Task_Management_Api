@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManagementApi.Enums;
-using TaskManagementApi.Model;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Enums;
 
-namespace TaskManagementApi.Context.Configurations
+namespace TaskManagement.Api.Context.Configurations
 {
     public class TaskConfiguration : IEntityTypeConfiguration<TaskData>
     {

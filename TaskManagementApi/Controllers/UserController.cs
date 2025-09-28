@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json;
-using TaskManagementApi.DTO;
-using TaskManagementApi.Model;
-using TaskManagementApi.Repositories.IRepositories;
+using TaskManagement.Api.DTO;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Repositories.IRepositories;
 
-namespace TaskManagementApi.Controllers
+namespace TaskManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -87,9 +87,9 @@ namespace TaskManagementApi.Controllers
 
                 var fileInfo = new
                 {
-                    FileName = file.FileName,
+                    file.FileName,
                     Size = file.Length,
-                    ContentType = file.ContentType,
+                    file.ContentType,
                     SavedPath = filePath
                 };
 

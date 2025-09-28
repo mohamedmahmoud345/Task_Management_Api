@@ -4,10 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TaskManagementApi.DTO;
-using TaskManagementApi.Model;
+using TaskManagement.Api.DTO;
+using TaskManagement.Api.Model;
 
-namespace TaskManagementApi.Controllers
+namespace TaskManagement.Api.Controllers
 {
     /// <summary>
     /// Handles user authenitcation and account management
@@ -91,7 +91,7 @@ namespace TaskManagementApi.Controllers
 
                     return Ok(new
                     {
-                        token = token,
+                        token,
                         userId = user.Id,
                         userName = user.UserName,
                         email = user.Email,

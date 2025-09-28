@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>TaskManagementApi</name>
+        <name>TaskManagement.Api</name>
     </assembly>
     <members>
-        <member name="T:TaskManagementApi.Controllers.AccountController">
+        <member name="T:TaskManagement.Api.Controllers.AccountController">
             <summary>
             Handles user authenitcation and account management
             </summary>
         </member>
-        <member name="M:TaskManagementApi.Controllers.AccountController.Register(TaskManagementApi.DTO.RegisterDto)">
+        <member name="M:TaskManagement.Api.Controllers.AccountController.Register(TaskManagement.Api.DTO.RegisterDto)">
             <summary>
             Register a new user
             </summary>
@@ -19,8 +19,8 @@
             <response code = "400">Invalid registration data</response>
             <response code = "500">Internal server error</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TaskManagementApi.Controllers.AccountController.Login(TaskManagementApi.DTO.UserDto)" -->
-        <member name="T:TaskManagementApi.Controllers.TaskController">
+        <!-- Badly formed XML comment ignored for member "M:TaskManagement.Api.Controllers.AccountController.Login(TaskManagement.Api.DTO.UserDto)" -->
+        <member name="T:TaskManagement.Api.Controllers.TaskController">
             <summary>
             Provides endpoints for managing tasks
             </summary>
@@ -28,7 +28,7 @@
             require the user to be authorized and authenticated.  Tasks are scoped to the current user, and operations will
             only affect tasks owned by the user.</remarks>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.Get(System.Int32,System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.Get(System.Int32,System.Int32)">
             <summary>
             Retrieves a paginated list of tasks for the authenticated user
             </summary>
@@ -39,7 +39,7 @@
             <response code="404">No tasks found for the user</response>
             <response code="500">An error occurred while retrieving tasks</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.GetById(System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.GetById(System.Int32)">
             <summary>
             Retrieves a specific task by ID for the authenticated user
             </summary>
@@ -49,7 +49,7 @@
             <response code="404">Task not found or access denied</response>
             <response code="500">An error occurred while retrieving the task</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.Add(TaskManagementApi.DTO.TaskDto)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.Add(TaskManagement.Api.DTO.TaskDto)">
             <summary>
             Creates a new task for the authenticated user
             </summary>
@@ -59,7 +59,7 @@
             <response code="400">Invalid task data provided</response>
             <response code="500">An error occurred while creating the task</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.Edit(System.Int32,TaskManagementApi.DTO.TaskDto)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.Edit(System.Int32,TaskManagement.Api.DTO.TaskDto)">
             <summary>
             Updates an existing task for the authenticated user
             </summary>
@@ -71,7 +71,7 @@
             <response code="404">Task not found or access denied</response>
             <response code="500">An error occurred while updating the task</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.Delete(System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.Delete(System.Int32)">
             <summary>
             Deletes a task for the authenticated user
             </summary>
@@ -81,7 +81,7 @@
             <response code="404">Task not found or access denied</response>
             <response code="500">An error occurred while deleting the task</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.GetByStatus(System.Int32,System.Int32,System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.GetByStatus(System.Int32,System.Int32,System.Int32)">
             <summary>
             Retrieves tasks filtered by status for the authenticated user
             </summary>
@@ -94,7 +94,7 @@
             <response code="404">No tasks found with the specified status</response>
             <response code="500">An error occurred while filtering tasks</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.GetByPriority(System.Int32,System.Int32,System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.GetByPriority(System.Int32,System.Int32,System.Int32)">
             <summary>
             Retrieves tasks filtered by priority for the authenticated user
             </summary>
@@ -107,7 +107,7 @@
             <response code="404">No tasks found with the specified priority</response>
             <response code="500">An error occurred while filtering tasks</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.TaskController.SearchByTitle(System.String,System.Int32,System.Int32)">
+        <member name="M:TaskManagement.Api.Controllers.TaskController.SearchByTitle(System.String,System.Int32,System.Int32)">
             <summary>
             Searches tasks by title for the authenticated user
             </summary>
@@ -119,7 +119,7 @@
             <response code="404">No tasks found matching the search term</response>
             <response code="500">An error occurred while searching tasks</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.UploadPhoto(Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:TaskManagement.Api.Controllers.UserController.UploadPhoto(Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
             Uploads a profile photo for the authenticated user
             </summary>
@@ -129,7 +129,7 @@
             <response code="400">Invalid file type, size, or no file provided</response>
             <response code="500">An error occurred while uploading the photo</response>   
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.GetPhoto">
+        <member name="M:TaskManagement.Api.Controllers.UserController.GetPhoto">
             <summary>
             Retrieves the profile photo URL for the authenticated user
             </summary>
@@ -138,7 +138,7 @@
             <response code="404">No profile photo found for the user</response>
             <response code="500">An error occurred while retrieving the photo</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.DeletePhoto">
+        <member name="M:TaskManagement.Api.Controllers.UserController.DeletePhoto">
             <summary>
             Deletes the profile photo for the authenticated user
             </summary>
@@ -147,7 +147,7 @@
             <response code="400">User doesn't have a profile photo</response>
             <response code="500">An error occurred while deleting the photo</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.ChangeName(TaskManagementApi.DTO.NameDto)">
+        <member name="M:TaskManagement.Api.Controllers.UserController.ChangeName(TaskManagement.Api.DTO.NameDto)">
             <summary>
             Changes the display name for the authenticated user
             </summary>
@@ -158,7 +158,7 @@
             <response code="404">User not found</response>
             <response code="500">An error occurred while changing the name</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.ChangeEmail(System.String)">
+        <member name="M:TaskManagement.Api.Controllers.UserController.ChangeEmail(System.String)">
             <summary>
             Changes the email address for the authenticated user
             </summary>
@@ -169,7 +169,7 @@
             <response code="404">User not found</response>
             <response code="500">An error occurred while changing the email</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.ResetPassword(TaskManagementApi.DTO.ChangePasswordDto)">
+        <member name="M:TaskManagement.Api.Controllers.UserController.ResetPassword(TaskManagement.Api.DTO.ChangePasswordDto)">
             <summary>
             Resets the password for the authenticated user
             </summary>
@@ -180,7 +180,7 @@
             <response code="401">Old password is incorrect</response>
             <response code="500">An error occurred while resetting the password</response>
         </member>
-        <member name="M:TaskManagementApi.Controllers.UserController.GetProfile">
+        <member name="M:TaskManagement.Api.Controllers.UserController.GetProfile">
             <summary>
             Retrieves the profile information for the authenticated user
             </summary>

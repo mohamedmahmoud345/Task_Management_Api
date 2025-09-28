@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using TaskManagementApi.Context;
-using TaskManagementApi.Model;
-using TaskManagementApi.Repositories.IRepositories;
+using TaskManagement.Api.Context;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Repositories.IRepositories;
 
-namespace TaskManagementApi.Repositories
+namespace TaskManagement.Api.Repositories
 {
     public class UserRepository : IUserRepository
     {

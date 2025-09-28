@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TaskManagementApi.DTO;
-using TaskManagementApi.Extensions;
-using TaskManagementApi.Model;
-using TaskManagementApi.Repositories.IRepositories;
+using TaskManagement.Api.DTO;
+using TaskManagement.Api.Extensions;
+using TaskManagement.Api.Model;
+using TaskManagement.Api.Repositories.IRepositories;
 
-
-namespace TaskManagementApi.Controllers
+namespace TaskManagement.Api.Controllers
 {
     /// <summary>
     /// Provides endpoints for managing tasks
@@ -31,7 +30,7 @@ namespace TaskManagementApi.Controllers
         private string GetCurrentUserId()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException("User Id Not Found");
+            if (string.IsNullOrEmpty(userId)) return null;
 
             return userId;
         }
@@ -51,7 +50,11 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                if(userId == null)
+                    return NotFound("User Not Found");
+
                 var tasks = await repo.GetAsync(userId);
+
                 if(!tasks.Any()) return NotFound();
 
                 return Ok(Pagination(tasks , pageNumber , pageSize));
@@ -76,6 +79,8 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound("User Not Found");
+
                 var task = await repo.GetByIdAsync(id , userId);
                 if(task == null) return NotFound();
 
@@ -103,6 +108,8 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+
+                if (userId == null) return NotFound();
                 data.Id = 0;
 
                 var task = await repo.AddAsync(data , userId);
@@ -134,6 +141,7 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
                 var success = await repo.EditAsync(data , userId);
                 if (success != true)
                     return NotFound($"Task With Id {id} not found or access denied");
@@ -162,10 +170,11 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
                 var success = await repo.RemoveAsync(id , userId);
 
                 if (success != true)
-                    return NotFound($"Task with ID {id} not found or access denied");
+                    return NotFound();
 
                 await repo.SaveAsync();
 
@@ -195,7 +204,9 @@ namespace TaskManagementApi.Controllers
             try
             {
                 if(statusNumber < 0 || statusNumber > 3) return BadRequest();
+                
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
 
                 var tasks = await repo.FilterByStatus(statusNumber, userId);
 
@@ -229,6 +240,7 @@ namespace TaskManagementApi.Controllers
             {
                 if(priorityNumber < 0 || priorityNumber > 3) return BadRequest();
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
 
                 var tasks = await repo.FilterByPriority(priorityNumber, userId);
 
@@ -260,6 +272,8 @@ namespace TaskManagementApi.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
+
                 var tasks = await repo.SearchByTitle(title.ToLower(), userId);
 
                 if (!tasks.Any())
