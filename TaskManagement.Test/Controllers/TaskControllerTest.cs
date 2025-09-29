@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TaskManagement.Api.Controllers;
 using TaskManagement.Api.DTO;
 using TaskManagement.Api.Enums;
@@ -16,11 +15,10 @@ namespace TaskManagement.Tests.Controllers
 {
     public class TaskControllerTest
     {
-            private readonly string userId = "1";
+        private readonly string userId = "1";
         private readonly Mock<ITaskRepository> repo;
         private readonly Mock<ILogger<TaskController>> logger;
         private readonly TaskController controller;
-        private object internalServerError;
 
         public TaskControllerTest()
         {

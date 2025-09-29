@@ -19,14 +19,12 @@ namespace TaskManagement.Api.Controllers
         private readonly ILogger<UserController> logger;
         private readonly IUserRepository repo;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IConfiguration config;
         public UserController(ILogger<UserController> logger, IWebHostEnvironment environment, IUserRepository repo, UserManager<ApplicationUser> userManager, IConfiguration config)
         {
             this.logger = logger;
             this.environment = environment;
             this.repo = repo;
             this.userManager = userManager;
-            this.config = config;
         }
 
         private string GetUserId()
