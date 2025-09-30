@@ -19,7 +19,7 @@ namespace TaskManagement.Api.Controllers
         private readonly ILogger<UserController> logger;
         private readonly IUserRepository repo;
         private readonly UserManager<ApplicationUser> userManager;
-        public UserController(ILogger<UserController> logger, IWebHostEnvironment environment, IUserRepository repo, UserManager<ApplicationUser> userManager, IConfiguration config)
+        public UserController(ILogger<UserController> logger, IWebHostEnvironment environment, IUserRepository repo, UserManager<ApplicationUser> userManager)
         {
             this.logger = logger;
             this.environment = environment;
