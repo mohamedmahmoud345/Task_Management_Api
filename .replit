@@ -36,3 +36,8 @@ externalPort = 80
 [[ports]]
 localPort = 38809
 externalPort = 3000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["dotnet", "run", "--project", "TaskManagementApi/TaskManagement.Api.csproj", "--no-build", "-c", "Release"]
+build = ["dotnet", "build", "TaskManagementApi/TaskManagement.Api.csproj", "-c", "Release"]
