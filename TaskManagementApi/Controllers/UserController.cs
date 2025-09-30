@@ -50,6 +50,8 @@ namespace TaskManagement.Api.Controllers
             {
                 var userId = GetUserId();
 
+                if (userId == null) return NotFound();
+
                 var userPhoto = await repo.IsUserHasProfilePicture(userId);
 
                 if (userPhoto.HasPhoto)
@@ -113,6 +115,8 @@ namespace TaskManagement.Api.Controllers
             {
                 var userId = GetUserId();
 
+                if (userId == null) return NotFound();
+
                 var userPhoto = await repo.IsUserHasProfilePicture(userId);
                 if (!userPhoto.HasPhoto)
                     return NotFound("No profile photo found");
@@ -141,6 +145,7 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetUserId();
+                if (userId == null) return NotFound();
                 var user = await repo.GetUserById(userId);
 
                 if (user.ProfilePicturePath is null)
@@ -174,6 +179,7 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetUserId();
+                if (userId == null) return NotFound();
 
                 var user = await repo.GetUserById(userId);
                 if (user == null)
@@ -206,6 +212,7 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetUserId();
+                if (userId == null) return NotFound();
                 var user = await repo.GetUserById(userId);
 
                 if (user == null)
@@ -246,6 +253,7 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetUserId();
+                if (userId == null) return NotFound();
 
                 var user = await repo.GetUserById(userId);
                
@@ -280,6 +288,7 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetUserId();
+                if (userId == null) return NotFound();
                 var user = await repo.GetUserById(userId);
 
                 if(user == null) return NotFound("User Not Found");
