@@ -189,17 +189,5 @@
             <response code="404">User not found</response>
             <response code="500">An error occurred while retrieving the profile</response>
         </member>
-        <member name="T:TaskManagementApi.Migrations.initial">
-            <inheritdoc />
-        </member>
-        <member name="M:TaskManagementApi.Migrations.initial.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:TaskManagementApi.Migrations.initial.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:TaskManagementApi.Migrations.initial.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
     </members>
 </doc>
