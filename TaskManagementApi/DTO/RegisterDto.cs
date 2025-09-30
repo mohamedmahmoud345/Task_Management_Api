@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Azure;
+using System.ComponentModel.DataAnnotations;
 
 namespace TaskManagement.Api.DTO
 {
