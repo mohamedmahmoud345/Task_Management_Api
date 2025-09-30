@@ -79,7 +79,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("conStr"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("conStr"));
 });
 
 
@@ -128,7 +128,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 app.UseCors(corsStr);
 
