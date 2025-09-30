@@ -5,3 +5,8 @@ obj/
 
 /wwwroot/Uploads/
 *.csproj.user
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
