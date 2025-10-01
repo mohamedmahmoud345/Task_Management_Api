@@ -30,7 +30,7 @@ namespace TaskManagement.Api.Controllers
         private string GetUserId()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException("User Not Found");
+            if (string.IsNullOrEmpty(userId)) return null;
 
             return userId;
         }
@@ -259,7 +259,7 @@ namespace TaskManagement.Api.Controllers
                
                 var isValidPassword = await userManager.CheckPasswordAsync(user , passwordDto.OldPassword);
                 if (!isValidPassword)
-                    return Unauthorized("Old Password Not Correct");
+                    return BadRequest("Old Password Not Correct");
 
                 var result = await userManager.ChangePasswordAsync
                     (user, passwordDto.OldPassword , passwordDto.NewPassword);
