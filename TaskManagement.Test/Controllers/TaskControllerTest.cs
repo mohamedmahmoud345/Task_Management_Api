@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TaskManagement.Api.Controllers;
 using TaskManagement.Api.DTO;
 using TaskManagement.Api.Enums;
@@ -20,14 +19,14 @@ namespace TaskManagement.Tests.Controllers
         private readonly Mock<ITaskRepository> repo;
         private readonly Mock<ILogger<TaskController>> logger;
         private readonly TaskController controller;
-
+        private readonly IMemoryCache cache;
         public TaskControllerTest()
         {
 
             repo = new Mock<ITaskRepository>();
             logger = new Mock<ILogger<TaskController>>();
-
-            controller = new TaskController(repo.Object, logger.Object) ;
+            cache = new MemoryCache(new MemoryCacheOptions());
+            controller = new TaskController(repo.Object, logger.Object , cache);
 
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
@@ -79,7 +78,7 @@ namespace TaskManagement.Tests.Controllers
         }
 
         [Fact]
-        public async Task Get_NoTasks_ReturnsNotFound()
+        public async Task Get_NoTasks_ReturnsOkWithEmptyList()
         {
             List<TaskData> list = [];
 
@@ -87,8 +86,8 @@ namespace TaskManagement.Tests.Controllers
 
             var result = await controller.Get(1, 5);
 
-            var notFoundResult = Assert.IsType<NotFoundResult>(result);
-            Assert.NotNull(notFoundResult);
+            var emptyList = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(list, emptyList.Value);
         }
 
         [Fact]
