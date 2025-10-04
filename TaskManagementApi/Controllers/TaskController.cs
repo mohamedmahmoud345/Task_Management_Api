@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 using System.Security.Claims;
 using TaskManagement.Api.DTO;
 using TaskManagement.Api.Extensions;
@@ -21,10 +23,12 @@ namespace TaskManagement.Api.Controllers
     {
         private readonly ITaskRepository repo;
         private readonly ILogger<TaskController> logger;
-        public TaskController(ITaskRepository repo, ILogger<TaskController> logger)
+        private readonly IMemoryCache cache;
+        public TaskController(ITaskRepository repo, ILogger<TaskController> logger , IMemoryCache cache)
         {
             this.repo = repo;
             this.logger = logger;
+            this.cache = cache;
         }
 
         private string GetCurrentUserId()
@@ -50,20 +54,31 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                var casheKey = $"tasks{userId}";
+
                 if(userId == null)
                     return NotFound("User Not Found");
 
-                var tasks = await repo.GetAsync(userId);
+                if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
+                {
+                    tasks = await repo.GetAsync(userId);
 
-                if(!tasks.Any()) return NotFound();
+                    var cacheEntryOptions =
+                        new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
 
-                return Ok(Pagination(tasks , pageNumber , pageSize));
+                    cache.Set(casheKey, tasks , cacheEntryOptions);
+                }
+
+                var pagedTasks = Pagination(tasks, pageNumber, pageSize);
+
+                return Ok(pagedTasks);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error Retrieving Tasks");
                 return StatusCode(500, "An Error Occurred whlie retrieving tasks");
             }
+
         }
         /// <summary>
         /// Retrieves a specific task by ID for the authenticated user
@@ -204,16 +219,24 @@ namespace TaskManagement.Api.Controllers
             try
             {
                 if(statusNumber < 0 || statusNumber > 3) return BadRequest();
-                
                 var userId = GetCurrentUserId();
                 if (userId == null) return NotFound();
 
-                var tasks = await repo.FilterByStatus(statusNumber, userId);
+                var casheKey = $"get by stastus {userId}";
 
-                if (!tasks.Any())
-                    return NotFound();
+                if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
+                {
+                    tasks = await repo.FilterByStatus(statusNumber, userId);
 
-                return Ok(Pagination(tasks , pageNumber , pageSize));
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); 
+
+                    cache.Set(casheKey, tasks, cacheEntryOptions);
+                }
+
+                var pagination = Pagination(tasks, pageNumber, pageSize);
+
+                return Ok(pagination);
             }
             catch (Exception ex)
             {
@@ -241,13 +264,19 @@ namespace TaskManagement.Api.Controllers
                 if(priorityNumber < 0 || priorityNumber > 3) return BadRequest();
                 var userId = GetCurrentUserId();
                 if (userId == null) return NotFound();
+                var cacheKey = $"get by priority {userId}";
 
-                var tasks = await repo.FilterByPriority(priorityNumber, userId);
+                if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
+                {
+                    tasks = await repo.FilterByPriority(priorityNumber, userId);
 
-                if (!tasks.Any())
-                    return NotFound();
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                    cache.Set(cacheKey, tasks, cacheEntryOptions);
+                }
 
-                return Ok(Pagination(tasks, pageNumber , pageSize));
+                var pagination = Pagination(tasks, pageNumber, pageSize);
+                return Ok(pagination);
             }
             catch (Exception ex)
             {
@@ -273,13 +302,20 @@ namespace TaskManagement.Api.Controllers
             {
                 var userId = GetCurrentUserId();
                 if (userId == null) return NotFound();
+                var cacheKey = $"search by title {userId}";
 
-                var tasks = await repo.SearchByTitle(title.ToLower(), userId);
+                if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
+                {
+                    tasks = await repo.SearchByTitle(title.ToLower(), userId);
 
-                if (!tasks.Any())
-                    return NotFound();
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                    cache.Set(cacheKey, tasks, cacheEntryOptions);
+                }
 
-                return Ok(Pagination(tasks, pageNumber , pageSize));
+                var pagination = Pagination(tasks, pageNumber, pageSize);
+
+                return Ok(pagination);
             }
             catch(Exception ex)
             {
