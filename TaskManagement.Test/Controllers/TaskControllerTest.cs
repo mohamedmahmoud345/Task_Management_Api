@@ -86,8 +86,8 @@ namespace TaskManagement.Tests.Controllers
 
             var result = await controller.Get(1, 5);
 
-            var emptyList = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(list, emptyList.Value);
+            var okWithemptyList = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(list, okWithemptyList.Value);
         }
 
         [Fact]
@@ -381,16 +381,17 @@ namespace TaskManagement.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetByStatus_WithUnexictTasks_ReturnsNotFound()
+        public async Task GetByStatus_WithUnexictTasks_ReturnsOkWithEmptyList()
         {
+            List<TaskData> list = [];
             int statusNumber = 2;
-
+            
             repo.Setup(x => x.FilterByStatus(statusNumber, userId)).ReturnsAsync([]);
 
             var result = await controller.GetByStatus(statusNumber);
 
-            var notFound = Assert.IsType<NotFoundResult>(result);
-            Assert.NotNull(notFound);
+            var okWithemptyList = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(list, okWithemptyList.Value);
         }
         [Fact]
         public async Task GetByStatus_WithValidRequest_ReturnsOkWithData()
@@ -455,15 +456,16 @@ namespace TaskManagement.Tests.Controllers
             Assert.NotNull(notFound);
         }
         [Fact]
-        public async Task GetByPriority_WithUnexictTasks_ReturnsNotFound()
+        public async Task GetByPriority_WithUnexictTasks_ReturnsOkWithEmptyList()
         {
+            List<TaskData> list = [];
             int priorityNumber = 3;
             repo.Setup(x => x.FilterByPriority(priorityNumber, userId)).ReturnsAsync([]);
 
             var result = await controller.GetByPriority(priorityNumber);
 
-            var notFound = Assert.IsType<NotFoundResult>(result);
-            Assert.NotNull(notFound);
+            var emptyList = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(list, emptyList.Value);
         }
         [Fact]
         public async Task GetByPriority_ValidData_ReturnsOk()
@@ -515,16 +517,16 @@ namespace TaskManagement.Tests.Controllers
             Assert.NotNull(notfound);
         }
         [Fact]
-        public async Task SearchByTitle_WithUnexictTasks_ReturnsNotFound()
+        public async Task SearchByTitle_WithUnexictTasks_ReturnsOkWithEmptyList()
         {
+            List<TaskData> list = [];
             var title = "title";
-
             repo.Setup(x => x.SearchByTitle(title, userId)).ReturnsAsync([]);
 
             var result = await controller.SearchByTitle(title);
 
-            var notFound = Assert.IsType<NotFoundResult>(result);
-            Assert.NotNull(notFound);
+            var okWithemptyList = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(list, okWithemptyList.Value);
         }
         [Fact]
         public async Task SearchBytitle_ValidData_ReturnsOk()
