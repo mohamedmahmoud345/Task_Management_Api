@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 using TaskManagement.Api.Context;
 using TaskManagement.Api.Model;
 using TaskManagement.Api.Repositories;
@@ -121,6 +124,34 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddMemoryCache();
 
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("per-user", context =>
+    {
+        string? userId = context.User.FindFirstValue("Id");
+
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            return RateLimitPartition.GetTokenBucketLimiter(userId,
+                _ => new TokenBucketRateLimiterOptions
+                {
+                    TokenLimit = 5,
+                    TokensPerPeriod = 1,
+                    ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                });
+        }
+
+        return RateLimitPartition.GetFixedWindowLimiter("anonyoums", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1)
+        });
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -140,5 +171,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseRateLimiter();
 
 app.Run();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -19,6 +20,7 @@ namespace TaskManagement.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [EnableRateLimiting("per-user")]
     public class TaskController : ControllerBase
     {
         private readonly ITaskRepository repo;
