@@ -43,26 +43,19 @@ namespace TaskManagement.Api.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            try
+
+            var user = new ApplicationUser()
             {
-                var user = new ApplicationUser()
-                {
-                    UserName = request.UserName,
-                    Email = request.Email
-                };
+                UserName = request.UserName,
+                Email = request.Email
+            };
 
-                var result = await _user.CreateAsync(user, request.Password);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors.Select(e => e.Description));
+            var result = await _user.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors.Select(e => e.Description));
 
 
-                return Ok(new {message = "User Register Successfully"});
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error During User Registeration");
-                return StatusCode(500, "An Error Occured During Registeration");
-            }
+            return Ok(new {message = "User Register Successfully"});
         }
 
         /// <summary>
@@ -81,27 +74,18 @@ namespace TaskManagement.Api.Controllers
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
+            var user =await _user.FindByNameAsync(request.UserName);
+            if(user != null &&await _user.CheckPasswordAsync(user , request.Password))
             {
+                var token = GenerateJwtToken(user);
 
-                var user =await _user.FindByNameAsync(request.UserName);
-                if(user != null &&await _user.CheckPasswordAsync(user , request.Password))
+                return Ok(new
                 {
-                    var token = GenerateJwtToken(user);
-
-                    return Ok(new
-                    {
-                        token,
-                        userId = user.Id,
-                        userName = user.UserName,
-                        email = user.Email,
-                    });
-                }
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error During User Login");
-                return StatusCode(500, "An Error Occured During User Login");
+                    token,
+                    userId = user.Id,
+                    userName = user.UserName,
+                    email = user.Email,
+                });
             }
             return Unauthorized();
         }

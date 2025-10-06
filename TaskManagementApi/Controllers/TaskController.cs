@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
-using System.Diagnostics;
 using System.Security.Claims;
 using TaskManagement.Api.DTO;
 using TaskManagement.Api.Extensions;
@@ -53,34 +52,26 @@ namespace TaskManagement.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] int pageNumber=1 , [FromQuery] int pageSize = 5)
         {
-            try
+            var userId = GetCurrentUserId();
+            var casheKey = $"tasks{userId}";
+            
+            if(userId == null)
+                return NotFound("User Not Found");
+
+
+            if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
             {
-                var userId = GetCurrentUserId();
-                var casheKey = $"tasks{userId}";
+                tasks = await repo.GetAsync(userId);
 
-                if(userId == null)
-                    return NotFound("User Not Found");
+                var cacheEntryOptions =
+                    new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
 
-                if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
-                {
-                    tasks = await repo.GetAsync(userId);
-
-                    var cacheEntryOptions =
-                        new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-
-                    cache.Set(casheKey, tasks , cacheEntryOptions);
-                }
-
-                var pagedTasks = Pagination(tasks, pageNumber, pageSize);
-
-                return Ok(pagedTasks);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error Retrieving Tasks");
-                return StatusCode(500, "An Error Occurred whlie retrieving tasks");
+                cache.Set(casheKey, tasks , cacheEntryOptions);
             }
 
+            var pagedTasks = Pagination(tasks, pageNumber, pageSize);
+
+            return Ok(pagedTasks);
         }
         /// <summary>
         /// Retrieves a specific task by ID for the authenticated user
@@ -93,21 +84,14 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound("User Not Found");
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound("User Not Found");
 
-                var task = await repo.GetByIdAsync(id , userId);
-                if(task == null) return NotFound();
+            var task = await repo.GetByIdAsync(id , userId);
+            if(task == null) return NotFound();
 
-                return Ok(task.ToDto());
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error retrieving task {TaskId}", id);
-                return StatusCode(500, "An error occurred while retrieving the task");
-            }   
+            return Ok(task.ToDto());
+            
         }
         /// <summary>
         /// Creates a new task for the authenticated user
@@ -122,23 +106,17 @@ namespace TaskManagement.Api.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            try
-            {
-                var userId = GetCurrentUserId();
 
-                if (userId == null) return NotFound();
-                data.Id = 0;
+            var userId = GetCurrentUserId();
 
-                var task = await repo.AddAsync(data , userId);
-                await repo.SaveAsync();
+            if (userId == null) return NotFound();
+            data.Id = 0;
 
-                return CreatedAtAction(nameof(GetById) , new {id = task.Id } , task.ToDto());
-            }
-            catch(Exception ex)
-            {
-                logger.LogError("Error Creating Task");
-                return StatusCode(500, "an error occurred while creating new task");
-            }
+            var task = await repo.AddAsync(data , userId);
+            await repo.SaveAsync();
+
+            return CreatedAtAction(nameof(GetById) , new {id = task.Id } , task.ToDto());
+  
         }
         /// <summary>
         /// Updates an existing task for the authenticated user
@@ -155,23 +133,15 @@ namespace TaskManagement.Api.Controllers
         {
             if (id != data.Id || !ModelState.IsValid) return BadRequest();
 
-            try
-            {
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound();
-                var success = await repo.EditAsync(data , userId);
-                if (success != true)
-                    return NotFound($"Task With Id {id} not found or access denied");
-                await repo.SaveAsync();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
+            var success = await repo.EditAsync(data , userId);
+            if (success != true)
+                return NotFound($"Task With Id {id} not found or access denied");
+            await repo.SaveAsync();
 
-                return NoContent();
-            }
+            return NoContent();
 
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error updating task {TaskId}", id);
-                return StatusCode(500, "An error occurred while updating the task");
-            }
         }
         /// <summary>
         /// Deletes a task for the authenticated user
@@ -184,24 +154,17 @@ namespace TaskManagement.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id) 
         {
-            try
-            {
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound();
-                var success = await repo.RemoveAsync(id , userId);
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
+            var success = await repo.RemoveAsync(id , userId);
 
-                if (success != true)
-                    return NotFound();
+            if (success != true)
+                return NotFound();
 
-                await repo.SaveAsync();
+            await repo.SaveAsync();
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error deleting task {TaskId}", id);
-                return StatusCode(500, "An error occurred while deleting the task");
-            }
+            return NoContent();
+
         }
         /// <summary>
         /// Retrieves tasks filtered by status for the authenticated user
@@ -218,33 +181,26 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> GetByStatus
             (int statusNumber , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            try
+            if(statusNumber < 0 || statusNumber > 3) return BadRequest();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
+
+            var casheKey = $"get by stastus {userId}";
+
+            if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
             {
-                if(statusNumber < 0 || statusNumber > 3) return BadRequest();
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound();
+                tasks = await repo.FilterByStatus(statusNumber, userId);
 
-                var casheKey = $"get by stastus {userId}";
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); 
 
-                if(!cache.TryGetValue(casheKey , out List<TaskData> tasks))
-                {
-                    tasks = await repo.FilterByStatus(statusNumber, userId);
-
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); 
-
-                    cache.Set(casheKey, tasks, cacheEntryOptions);
-                }
-
-                var pagination = Pagination(tasks, pageNumber, pageSize);
-
-                return Ok(pagination);
+                cache.Set(casheKey, tasks, cacheEntryOptions);
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error on filtartion by status");
-                return StatusCode(500, "an error occured while status filtration");
-            }
+
+            var pagination = Pagination(tasks, pageNumber, pageSize);
+
+            return Ok(pagination);
+
         }
         /// <summary>
         /// Retrieves tasks filtered by priority for the authenticated user
@@ -261,30 +217,23 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> GetByPriority
             (int priorityNumber , [FromQuery] int pageNumber = 1 , [FromQuery] int pageSize = 5)
         {
-            try
+            if(priorityNumber < 0 || priorityNumber > 3) return BadRequest();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
+            var cacheKey = $"get by priority {userId}";
+
+            if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
             {
-                if(priorityNumber < 0 || priorityNumber > 3) return BadRequest();
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound();
-                var cacheKey = $"get by priority {userId}";
+                tasks = await repo.FilterByPriority(priorityNumber, userId);
 
-                if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
-                {
-                    tasks = await repo.FilterByPriority(priorityNumber, userId);
-
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-                    cache.Set(cacheKey, tasks, cacheEntryOptions);
-                }
-
-                var pagination = Pagination(tasks, pageNumber, pageSize);
-                return Ok(pagination);
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, tasks, cacheEntryOptions);
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error on filtartion by priority");
-                return StatusCode(500, "an error occured while priority filtration");
-            }
+
+            var pagination = Pagination(tasks, pageNumber, pageSize);
+            return Ok(pagination);
+
         }
         /// <summary>
         /// Searches tasks by title for the authenticated user
@@ -300,30 +249,24 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> SearchByTitle
             (string title , [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            try
+
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
+            var cacheKey = $"search by title {userId}";
+
+            if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
             {
-                var userId = GetCurrentUserId();
-                if (userId == null) return NotFound();
-                var cacheKey = $"search by title {userId}";
+                tasks = await repo.SearchByTitle(title.ToLower(), userId);
 
-                if(!cache.TryGetValue(cacheKey , out List<TaskData> tasks))
-                {
-                    tasks = await repo.SearchByTitle(title.ToLower(), userId);
-
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-                    cache.Set(cacheKey, tasks, cacheEntryOptions);
-                }
-
-                var pagination = Pagination(tasks, pageNumber, pageSize);
-
-                return Ok(pagination);
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, tasks, cacheEntryOptions);
             }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, "error on search action");
-                return StatusCode(500, "An error occured while searching");
-            }
+
+            var pagination = Pagination(tasks, pageNumber, pageSize);
+
+            return Ok(pagination);
+
         }
 
         private List<TaskDto> Pagination

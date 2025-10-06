@@ -48,60 +48,52 @@ namespace TaskManagement.Api.Controllers
         [HttpPost("upload-photo")]
         public async Task<IActionResult> UploadPhoto(IFormFile file)
         {
-            try
+            var userId = GetUserId();
+
+            if (userId == null) return NotFound();
+
+            var userPhoto = await repo.IsUserHasProfilePicture(userId);
+
+            if (userPhoto.HasPhoto)
             {
-                var userId = GetUserId();
+                var path = Path.Combine(environment.WebRootPath, "Uploads", userPhoto.PhotoPath);
 
-                if (userId == null) return NotFound();
+                if(System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+            }
 
-                var userPhoto = await repo.IsUserHasProfilePicture(userId);
+            if (file == null || file.Length == 0) return BadRequest("No file uploaded");
 
-                if (userPhoto.HasPhoto)
-                {
-                    var path = Path.Combine(environment.WebRootPath, "Uploads", userPhoto.PhotoPath);
+            var extenstions = new[] { ".jpg", ".png" };
+            var fileExtenstion = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!extenstions.Contains(fileExtenstion)) return BadRequest("Invalid file type");
 
-                    if(System.IO.File.Exists(path))
-                        System.IO.File.Delete(path);
-                }
+            if (file.Length > 10_000_000) return BadRequest("file too large");
 
-                if (file == null || file.Length == 0) return BadRequest("No file uploaded");
-
-                var extenstions = new[] { ".jpg", ".png" };
-                var fileExtenstion = Path.GetExtension(file.FileName).ToLowerInvariant();
-                if (!extenstions.Contains(fileExtenstion)) return BadRequest("Invalid file type");
-
-                if (file.Length > 10_000_000) return BadRequest("file too large");
-
-                var uploadFolder = Path.Combine(environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "Uploads");
+            var uploadFolder = Path.Combine(environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "Uploads");
 
                 
-                if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
+            if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
 
-                var uniqueFileName = Guid.NewGuid().ToString() + fileExtenstion;
-                var filePath = Path.Combine(uploadFolder , uniqueFileName);
+            var uniqueFileName = Guid.NewGuid().ToString() + fileExtenstion;
+            var filePath = Path.Combine(uploadFolder , uniqueFileName);
 
-                using(var stream = new FileStream(filePath , FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                await repo.UploadPhotoAsync(uniqueFileName , userId);
-
-                var fileInfo = new
-                {
-                    file.FileName,
-                    Size = file.Length,
-                    file.ContentType,
-                    SavedPath = filePath
-                };
-
-                return Ok(JsonSerializer.Serialize(fileInfo));
-            }
-            catch(Exception ex)
+            using(var stream = new FileStream(filePath , FileMode.Create))
             {
-                logger.LogError(ex, "Error uploading photo");
-                return StatusCode(500, "Internal Server Error");
+                await file.CopyToAsync(stream);
             }
+
+            await repo.UploadPhotoAsync(uniqueFileName , userId);
+
+            var fileInfo = new
+            {
+                file.FileName,
+                Size = file.Length,
+                file.ContentType,
+                SavedPath = filePath
+            };
+
+            return Ok(JsonSerializer.Serialize(fileInfo));
         }
         /// <summary>
         /// Retrieves the profile photo URL for the authenticated user
@@ -113,26 +105,19 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("Profile-Photo")]
         public async Task<IActionResult> GetPhoto()
         {
-            try
-            {
-                var userId = GetUserId();
+            var userId = GetUserId();
 
-                if (userId == null) return NotFound();
+            if (userId == null) return NotFound();
 
-                var userPhoto = await repo.IsUserHasProfilePicture(userId);
-                if (!userPhoto.HasPhoto)
-                    return NotFound("No profile photo found");
+            var userPhoto = await repo.IsUserHasProfilePicture(userId);
+            if (!userPhoto.HasPhoto)
+                return NotFound("No profile photo found");
 
-                var baseUrl = $"{Request.Scheme}";
-                var fileUrl = $"{baseUrl}/Uploads/{userPhoto.PhotoPath}";
+            var baseUrl = $"{Request.Scheme}";
+            var fileUrl = $"{baseUrl}/Uploads/{userPhoto.PhotoPath}";
 
-                return Ok(new {Url = fileUrl });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error while return the profile photo");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return Ok(new {Url = fileUrl });
+
         }
         /// <summary>
         /// Deletes the profile photo for the authenticated user
@@ -144,27 +129,20 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("delete-photo")]
         public async Task<IActionResult> DeletePhoto()
         {
-            try
-            {
-                var userId = GetUserId();
-                if (userId == null) return NotFound();
-                var user = await repo.GetUserById(userId);
+            var userId = GetUserId();
+            if (userId == null) return NotFound();
+            var user = await repo.GetUserById(userId);
 
-                if (user.ProfilePicturePath is null)
-                    return BadRequest("The user doesn't have a photo.");
+            if (user.ProfilePicturePath is null)
+                return BadRequest("The user doesn't have a photo.");
 
-                var path = Path.Combine(environment.WebRootPath, "UpLoads", user.ProfilePicturePath);
+            var path = Path.Combine(environment.WebRootPath, "UpLoads", user.ProfilePicturePath);
 
-                if (System.IO.File.Exists(path))
-                    System.IO.File.Delete(path);
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "error while delete photo endpoint");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return Ok();
+
         }
         /// <summary>
         /// Changes the display name for the authenticated user
@@ -178,26 +156,20 @@ namespace TaskManagement.Api.Controllers
         [HttpPut("Change-Name")]
         public async Task<IActionResult> ChangeName(NameDto nameDto)
         {
-            try
-            {
-                var userId = GetUserId();
-                if (userId == null) return NotFound();
+            var userId = GetUserId();
+            if (userId == null) return NotFound();
 
-                var user = await repo.GetUserById(userId);
-                if (user == null)
-                    return NotFound();
-                var result =await userManager.SetUserNameAsync(user, nameDto.Name);
+            var user = await repo.GetUserById(userId);
+            if (user == null)
+                return NotFound();
+            var result =await userManager.SetUserNameAsync(user, nameDto.Name);
 
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while try to change the user name");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return NoContent();
+            return StatusCode(500, "Internal Server Error");
+            
         }
         /// <summary>
         /// Changes the email address for the authenticated user
@@ -211,33 +183,26 @@ namespace TaskManagement.Api.Controllers
         [HttpPut("Change-Email/{newEmail}")]
         public async Task<IActionResult> ChangeEmail(string newEmail)
         {
-            try
-            {
-                var userId = GetUserId();
-                if (userId == null) return NotFound();
-                var user = await repo.GetUserById(userId);
+            
+            var userId = GetUserId();
+            if (userId == null) return NotFound();
+            var user = await repo.GetUserById(userId);
 
-                if (user == null)
-                    return BadRequest("User Not Found");
+            if (user == null)
+                return BadRequest("User Not Found");
 
-                var emailValidat = new EmailAddressAttribute();
-                if (!emailValidat.IsValid(newEmail))
-                    return BadRequest("Email Not Valid");
+            var emailValidat = new EmailAddressAttribute();
+            if (!emailValidat.IsValid(newEmail))
+                return BadRequest("Email Not Valid");
 
-                user.Email = newEmail;
+            user.Email = newEmail;
 
-                var result = await userManager.UpdateAsync(user);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-                return NoContent();
-                
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while try to change the user email");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return NoContent();
+
         }
         /// <summary>
         /// Resets the password for the authenticated user
@@ -252,30 +217,24 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> ResetPassword
             (ChangePasswordDto passwordDto)
         {
-            try
-            {
-                var userId = GetUserId();
-                if (userId == null) return NotFound();
+            var userId = GetUserId();
+            if (userId == null) return NotFound();
 
-                var user = await repo.GetUserById(userId);
+            var user = await repo.GetUserById(userId);
                
-                var isValidPassword = await userManager.CheckPasswordAsync(user , passwordDto.OldPassword);
-                if (!isValidPassword)
-                    return BadRequest("Old Password Not Correct");
+            var isValidPassword = await userManager.CheckPasswordAsync(user , passwordDto.OldPassword);
+            if (!isValidPassword)
+                return BadRequest("Old Password Not Correct");
 
-                var result = await userManager.ChangePasswordAsync
-                    (user, passwordDto.OldPassword , passwordDto.NewPassword);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
+            var result = await userManager.ChangePasswordAsync
+                (user, passwordDto.OldPassword , passwordDto.NewPassword);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-                return NoContent();
+            return NoContent();
                 
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while try to change the user password");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return StatusCode(500, "Internal Server Error");
+            
         }
         /// <summary>
         /// Retrieves the profile information for the authenticated user
@@ -287,30 +246,22 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
-            try
-            {
                 var userId = GetUserId();
-                if (userId == null) return NotFound();
-                var user = await repo.GetUserById(userId);
+            if (userId == null) return NotFound();
+            var user = await repo.GetUserById(userId);
 
-                if(user == null) return NotFound("User Not Found");
+            if(user == null) return NotFound("User Not Found");
 
-                var info = new ProfileDto
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    Email = user.Email,
-                    ProfilePicture = $"{Request.Scheme}/Uploads/{user.ProfilePicturePath}",
-                };
-
-                return Ok(info);
-
-            }
-            catch (Exception ex)
+            var info = new ProfileDto
             {
-                logger.LogError(ex, "Error while try to return profile info");
-                return StatusCode(500, "Internal Server Error");
-            }
+                Id = user.Id,
+                Name = user.UserName,
+                Email = user.Email,
+                ProfilePicture = $"{Request.Scheme}/Uploads/{user.ProfilePicturePath}",
+            };
+
+            return Ok(info);
+
         }
 
     }
