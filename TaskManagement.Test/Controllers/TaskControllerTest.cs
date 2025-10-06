@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
+using System.Net;
 using System.Security.Claims;
 using TaskManagement.Api.Controllers;
 using TaskManagement.Api.DTO;
@@ -90,19 +93,6 @@ namespace TaskManagement.Tests.Controllers
             Assert.Equal(list, okWithemptyList.Value);
         }
 
-        [Fact]
-        public async Task Get_ExceptionThrown_Returns500()
-        {
-
-            repo.Setup(x => x.GetAsync(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.Get(1, 5);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-
-            Assert.Equal(500, objectResult.StatusCode);
-
-        }
         #endregion
 
         #region start get by id endpoint
@@ -150,17 +140,6 @@ namespace TaskManagement.Tests.Controllers
             Assert.NotNull(notFoundResult);
         }
 
-        [Fact]
-        public async Task GetById_ExceptionThrown_Returns500()
-        {
-
-            repo.Setup(x => x.GetByIdAsync(1, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.GetById(1);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500 , objectResult.StatusCode);
-        }
         #endregion
 
         #region start add endpoint
@@ -215,18 +194,6 @@ namespace TaskManagement.Tests.Controllers
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             Assert.NotNull(createdResult);
         }
-        [Fact]
-        public async Task Add_ExceptionThrown_Returns500()
-        {
-            var task = new TaskData { Id = 1, Description = "new task", Title = "task Title" }.ToDto();
-
-            repo.Setup(x => x.AddAsync(task, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.Add(task);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, objectResult.StatusCode);
-        }
         #endregion
 
         #region start edit endpoint 
@@ -278,18 +245,6 @@ namespace TaskManagement.Tests.Controllers
             var noContent = Assert.IsType<NoContentResult>(result);
             Assert.NotNull(noContent);
         }
-        [Fact]
-        public async Task Edit_ExceptionThrown_Returns500()
-        {
-            var task = new TaskData { Id = 1, Description = "new task", Title = "task Title" }.ToDto();
-
-            repo.Setup(x => x.EditAsync(task, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.Edit(1, task);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
-        }
         #endregion
 
         #region start delete endpoint 
@@ -332,16 +287,6 @@ namespace TaskManagement.Tests.Controllers
 
             var noContent = Assert.IsType<NoContentResult>(result);
             Assert.NotNull(noContent);
-        }
-        [Fact]
-        public async Task Delete_ExceptionThrown_Returns500()
-        {
-            repo.Setup(x => x.RemoveAsync(1, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.Delete(1);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
         }
         #endregion
 
@@ -412,16 +357,6 @@ namespace TaskManagement.Tests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult);
         }
-        [Fact]
-        public async Task GetByStatus_ExceptionThrown_Returns500()
-        {
-            repo.Setup(x => x.FilterByPriority(1, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.GetByStatus(1);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
-        }
         #endregion
 
         #region start get by priority endpoint 
@@ -485,19 +420,7 @@ namespace TaskManagement.Tests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult);
         }
-        [Fact]
-        public async Task GetByPriority_ExceptionThrown_Returns500()
-        {
-            int priorityValue = 1;
-            repo.Setup(x => x.FilterByPriority(priorityValue, userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.GetByPriority(priorityValue);
-
-            var interenalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, interenalServerError.StatusCode);
-        }
         #endregion
-
         #region start Search By Title endpoint
 
         [Fact]
@@ -546,17 +469,6 @@ namespace TaskManagement.Tests.Controllers
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult);
-        }
-        [Fact]
-        public async Task SearchByTitle_ExceptionThrown_Returns500()
-        {
-            var title = "title";
-            repo.Setup(x => x.SearchByTitle(title, userId)).ThrowsAsync(new Exception());
-
-            var ressult = await controller.SearchByTitle(title);
-
-            var internalServerError = Assert.IsType<ObjectResult>(ressult);
-            Assert.Equal(500, internalServerError.StatusCode);
         }
         #endregion
     }

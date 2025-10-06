@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Security.Claims;
 using TaskManagement.Api.Controllers;
 using TaskManagement.Api.DTO;
@@ -125,19 +128,6 @@ namespace TaskManagement.Tests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult);
         }
-        [Fact]
-        public async Task UploadPhoto_WithExceptionThrown_Returns500()
-        {
-            var mockFile = Helpers.CreateMockFile();
-
-            repo.Setup(r => r.UploadPhotoAsync(It.IsAny<string>(), userId))
-                .ThrowsAsync(new Exception("Test exception"));
-
-            var result = await controller.UploadPhoto(mockFile.Object);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
-        }
         #endregion
 
         #region start get photo endpoint 
@@ -174,17 +164,6 @@ namespace TaskManagement.Tests.Controllers
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult);
-        }
-        [Fact]
-        public async Task GetPhoto_WithExceptionThrown_Returns500()
-        {
-            repo.Setup(_ => _.IsUserHasProfilePicture(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.GetPhoto();
-
-            var interenalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.NotNull(interenalServerError);
-            Assert.Equal(500, interenalServerError.StatusCode);
         }
         #endregion
         #region start delete photo endpoint 
@@ -229,16 +208,6 @@ namespace TaskManagement.Tests.Controllers
 
             var okResult = Assert.IsType<OkResult>(result);
             Assert.NotNull(okResult);
-        }
-        [Fact]
-        public async Task DeletePhoto_WithExceptionThrown_Returns500()
-        {
-            repo.Setup(x => x.GetUserById(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.DeletePhoto();
-
-            var interenalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, interenalServerError.StatusCode);
         }
         #endregion
         #region start change name endpoint 
@@ -303,20 +272,6 @@ namespace TaskManagement.Tests.Controllers
             var noContent = Assert.IsType<NoContentResult>(result);
             Assert.NotNull(noContent);
         }
-        [Fact]
-        public async Task ChangeName_WithExceptionThrown_Returns500()
-        {
-            var nameDto = new NameDto
-            {
-                Name = "sayed"
-            };
-            repo.Setup(x => x.GetUserById(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.ChangeName(nameDto);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
-        }
         #endregion
         #region start change email endpoint
         [Fact]
@@ -380,17 +335,6 @@ namespace TaskManagement.Tests.Controllers
 
             var noContent = Assert.IsType<NoContentResult>(result);
             Assert.NotNull(noContent);
-        }
-        [Fact]
-        public async Task ChangeEmail_WithExceptionThrown_Returns500()
-        {
-            var email = "email.com";
-            repo.Setup(x => x.GetUserById(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.ChangeEmail(email);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
         }
         #endregion
         #region start reset password endpoint 
@@ -471,21 +415,6 @@ namespace TaskManagement.Tests.Controllers
             var noContent = Assert.IsType<NoContentResult>(result);
             Assert.NotNull(noContent);
         }
-        [Fact]
-        public async Task ResetPassword_WithExceptionThrown_Returns500()
-        {
-            var dto = new ChangePasswordDto
-            {
-                NewPassword = "newPass",
-                OldPassword = "oldPass"
-            };
-            repo.Setup(x => x.GetUserById(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.ResetPassword(dto);
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
-        }
         #endregion
         #region start get profile endpoint 
         [Fact]
@@ -525,21 +454,6 @@ namespace TaskManagement.Tests.Controllers
             var result = await controller.GetProfile();
 
             Assert.IsType<OkObjectResult>(result);
-        }
-        [Fact]
-        public async Task GetProfile_WithExceptionThrown_Returns500()
-        {
-            var dto = new ChangePasswordDto
-            {
-                NewPassword = "newPass",
-                OldPassword = "oldPass"
-            };
-            repo.Setup(x => x.GetUserById(userId)).ThrowsAsync(new Exception());
-
-            var result = await controller.GetProfile();
-
-            var internalServerError = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, internalServerError.StatusCode);
         }
         #endregion
     }

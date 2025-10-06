@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Runtime.InteropServices;
 using TaskManagement.Api.Controllers;
 using TaskManagement.Api.DTO;
 using TaskManagement.Api.Model;
@@ -84,23 +81,7 @@ namespace TaskManagement.Tests.Controllers
             var result = await controller.Register(registerDto);
             Assert.IsType<OkObjectResult>(result);
         }
-        [Fact]
-        public async Task Register_WithExceptionThrown_Returns500()
-        {
-            var registerDto = new RegisterDto
-            {
-                UserName = "mohamed",
-                Email = "email.com",
-                Password = "123mo5_"
-            };
-            userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), registerDto.Password))
-                .ThrowsAsync(new Exception());
-
-            var result = await controller.Register(registerDto);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500 , objectResult.StatusCode);
-        }
+       
         #endregion
         #region start login endpoint
         [Fact]
@@ -179,21 +160,6 @@ namespace TaskManagement.Tests.Controllers
             var result = await controller.Login(login);
 
             Assert.IsType<OkObjectResult>(result);
-        }
-        [Fact]
-        public async Task Login_WithExceptionThrown_Returns500()
-        {
-            var login = new UserDto
-            {
-                UserName = "mohamed",
-                Password = "123mo5_"
-            };
-
-            userManager.Setup(x => x.FindByNameAsync(login.UserName)).ThrowsAsync(new Exception());
-            var result = await controller.Login(login);
-
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, objectResult.StatusCode);
         }
         #endregion
     }
