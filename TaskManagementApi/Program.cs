@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using TaskManagement.Api.Context;
+using TaskManagement.Api.Exceptions;
 using TaskManagement.Api.Model;
 using TaskManagement.Api.Repositories;
 using TaskManagement.Api.Repositories.IRepositories;
@@ -15,6 +15,15 @@ using TaskManagement.Api.Repositories.IRepositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddProblemDetails(cfg =>
+{
+    cfg.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+    };
+});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(
@@ -165,13 +174,14 @@ app.UseHttpsRedirection();
 
 app.UseCors(corsStr);
 
-app.UseStaticFiles();
+app.UseExceptionHandler();
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-
 app.UseRateLimiter();
+
+app.MapControllers();
 
 app.Run();

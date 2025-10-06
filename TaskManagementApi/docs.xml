@@ -189,6 +189,27 @@
             <response code="404">User not found</response>
             <response code="500">An error occurred while retrieving the profile</response>
         </member>
+        <member name="T:TaskManagement.Api.Exceptions.GlobalExceptionHandler">
+            <summary>
+            Middleware to handle global exceptions in the application.
+            </summary>
+        </member>
+        <member name="M:TaskManagement.Api.Exceptions.GlobalExceptionHandler.#ctor(Microsoft.Extensions.Logging.ILogger{TaskManagement.Api.Exceptions.GlobalExceptionHandler},Microsoft.AspNetCore.Http.IProblemDetailsService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:TaskManagement.Api.Exceptions.GlobalExceptionHandler"/> class.
+            </summary>
+            <param name="logger">The logger instance to log errors.</param>
+            <param name="problemDetailsService">The service for writing Problem Details responses.</param>
+        </member>
+        <member name="M:TaskManagement.Api.Exceptions.GlobalExceptionHandler.TryHandleAsync(Microsoft.AspNetCore.Http.HttpContext,System.Exception,System.Threading.CancellationToken)">
+            <summary>
+            Handles the specified exception by logging it and writing a Problem Details response.
+            </summary>
+            <param name="httpContext">The current HTTP context.</param>
+            <param name="exception">The unhandled exception.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.ValueTask`1"/> indicating if the exception was handled.</returns>
+        </member>
         <member name="T:TaskManagementApi.Migrations.initial">
             <inheritdoc />
         </member>
