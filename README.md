@@ -129,7 +129,10 @@ TaskManagementApi/
 │   │   └── IUserRepository.cs
 │   ├── TaskRepository.cs
 │   └── UserRepository.cs
-└── Program.cs
+├── wwwroot/
+│   └── Uploads/                  # User profile pictures storage
+├── appsettings.json              # Configuration file
+└── Program.cs                    # Application entry point
 
 TaskManagement.Test/
 ├── Controllers/
@@ -282,5 +285,8 @@ This project is available for educational and personal use.
 
 ## 📧 Contact
 
-For any questions or support, please contact: mohamed987456mm20@gmail.com
+For any questions or support, please contact: support@taskmanagement.com
 
+---
+
+**Note**: Remember to update the JWT secret key in production and never commit sensitive configuration to version control. Use environment variables or Azure Key Vault for production deployments.
