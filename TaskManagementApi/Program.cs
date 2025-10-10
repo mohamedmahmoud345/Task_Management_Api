@@ -66,10 +66,10 @@ builder.Services.AddSwaggerGen(options =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"  // References the security definition above
+                    Id = "Bearer"
                 }
             },
-            Array.Empty<string>()  // No scope requirements
+            Array.Empty<string>()
         }
     });
 
@@ -106,7 +106,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddAuthentication(options =>
 {
-    // also this
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
