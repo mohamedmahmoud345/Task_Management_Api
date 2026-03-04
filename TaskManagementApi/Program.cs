@@ -75,7 +75,7 @@ builder.Services.AddSwaggerGen(options =>
 
     var xmlFile = "docs.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath , includeControllerXmlComments: true);
+    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
 var corsStr = "AllowFrontend";
@@ -117,7 +117,7 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            
+
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey =
